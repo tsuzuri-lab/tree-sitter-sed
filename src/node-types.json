@@ -1,0 +1,1111 @@
+[
+  {
+    "type": "address",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "escaped_regex_address",
+          "named": true
+        },
+        {
+          "type": "last_line_address",
+          "named": true
+        },
+        {
+          "type": "line_number_address",
+          "named": true
+        },
+        {
+          "type": "periodic_address",
+          "named": true
+        },
+        {
+          "type": "regex_address",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "address_range",
+    "named": true,
+    "fields": {
+      "end": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "address",
+            "named": true
+          },
+          {
+            "type": "next_multiple_address",
+            "named": true
+          },
+          {
+            "type": "relative_address",
+            "named": true
+          }
+        ]
+      },
+      "start": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "address",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "append_command",
+    "named": true,
+    "fields": {
+      "text": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "text_block",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "block_command",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "command_list",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "branch_command",
+    "named": true,
+    "fields": {
+      "label": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "label",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "change_command",
+    "named": true,
+    "fields": {
+      "text": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "text_block",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "command",
+    "named": true,
+    "fields": {
+      "addresses": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "address",
+            "named": true
+          },
+          {
+            "type": "address_range",
+            "named": true
+          }
+        ]
+      },
+      "body": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "append_command",
+            "named": true
+          },
+          {
+            "type": "block_command",
+            "named": true
+          },
+          {
+            "type": "branch_command",
+            "named": true
+          },
+          {
+            "type": "change_command",
+            "named": true
+          },
+          {
+            "type": "clear_command",
+            "named": true
+          },
+          {
+            "type": "delete_command",
+            "named": true
+          },
+          {
+            "type": "delete_first_line_command",
+            "named": true
+          },
+          {
+            "type": "exchange_command",
+            "named": true
+          },
+          {
+            "type": "execute_command",
+            "named": true
+          },
+          {
+            "type": "file_name_command",
+            "named": true
+          },
+          {
+            "type": "get_append_command",
+            "named": true
+          },
+          {
+            "type": "get_command",
+            "named": true
+          },
+          {
+            "type": "hold_append_command",
+            "named": true
+          },
+          {
+            "type": "hold_command",
+            "named": true
+          },
+          {
+            "type": "insert_command",
+            "named": true
+          },
+          {
+            "type": "label_command",
+            "named": true
+          },
+          {
+            "type": "line_number_command",
+            "named": true
+          },
+          {
+            "type": "list_command",
+            "named": true
+          },
+          {
+            "type": "next_append_command",
+            "named": true
+          },
+          {
+            "type": "next_command",
+            "named": true
+          },
+          {
+            "type": "print_command",
+            "named": true
+          },
+          {
+            "type": "print_first_line_command",
+            "named": true
+          },
+          {
+            "type": "quit_command",
+            "named": true
+          },
+          {
+            "type": "read_command",
+            "named": true
+          },
+          {
+            "type": "read_line_command",
+            "named": true
+          },
+          {
+            "type": "silent_quit_command",
+            "named": true
+          },
+          {
+            "type": "substitute_command",
+            "named": true
+          },
+          {
+            "type": "test_command",
+            "named": true
+          },
+          {
+            "type": "test_failure_command",
+            "named": true
+          },
+          {
+            "type": "translate_command",
+            "named": true
+          },
+          {
+            "type": "version_command",
+            "named": true
+          },
+          {
+            "type": "write_command",
+            "named": true
+          },
+          {
+            "type": "write_first_line_command",
+            "named": true
+          }
+        ]
+      },
+      "negation": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "negation",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "command_list",
+    "named": true,
+    "fields": {
+      "negation": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "negation",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "command",
+          "named": true
+        },
+        {
+          "type": "comment_command",
+          "named": true
+        },
+        {
+          "type": "separator",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "escaped_regex_address",
+    "named": true,
+    "fields": {
+      "flags": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "regex_flags",
+            "named": true
+          }
+        ]
+      },
+      "pattern": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "regex",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "execute_command",
+    "named": true,
+    "fields": {
+      "command": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "shell_command",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "execute_flag",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "exit_status",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "get_command",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "global_flag",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "ignore_case_flag",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "insert_command",
+    "named": true,
+    "fields": {
+      "text": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "text_block",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "label",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "label_command",
+    "named": true,
+    "fields": {
+      "label": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "label",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "line_number_address",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "line_offset",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "line_wrap_length",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "list_command",
+    "named": true,
+    "fields": {
+      "width": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "line_wrap_length",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "multiline_flag",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "next_multiple_address",
+    "named": true,
+    "fields": {
+      "multiple": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "step_value",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "occurrence_flag",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "periodic_address",
+    "named": true,
+    "fields": {
+      "start": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "line_number_address",
+            "named": true
+          }
+        ]
+      },
+      "step": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "step_value",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "print_command",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "print_flag",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "quit_command",
+    "named": true,
+    "fields": {
+      "status": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "exit_status",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "read_command",
+    "named": true,
+    "fields": {
+      "file": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "file_argument",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "read_line_command",
+    "named": true,
+    "fields": {
+      "file": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "file_argument",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "regex",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "regex_content",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "regex_address",
+    "named": true,
+    "fields": {
+      "flags": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "regex_flags",
+            "named": true
+          }
+        ]
+      },
+      "pattern": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "regex",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "regex_content",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "regex_flags",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "ignore_case_flag",
+          "named": true
+        },
+        {
+          "type": "multiline_flag",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "relative_address",
+    "named": true,
+    "fields": {
+      "offset": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "line_offset",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "replacement",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "script",
+    "named": true,
+    "root": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "command_list",
+          "named": true
+        },
+        {
+          "type": "first_line_silent",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "separator",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "silent_quit_command",
+    "named": true,
+    "fields": {
+      "status": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "exit_status",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "step_value",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "substitute_command",
+    "named": true,
+    "fields": {
+      "flags": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "substitute_flags",
+            "named": true
+          }
+        ]
+      },
+      "pattern": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "regex",
+            "named": true
+          }
+        ]
+      },
+      "replacement": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "replacement",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "substitute_flags",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "execute_flag",
+          "named": true
+        },
+        {
+          "type": "global_flag",
+          "named": true
+        },
+        {
+          "type": "ignore_case_flag",
+          "named": true
+        },
+        {
+          "type": "multiline_flag",
+          "named": true
+        },
+        {
+          "type": "occurrence_flag",
+          "named": true
+        },
+        {
+          "type": "print_flag",
+          "named": true
+        },
+        {
+          "type": "write_flag",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "test_command",
+    "named": true,
+    "fields": {
+      "label": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "label",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "test_failure_command",
+    "named": true,
+    "fields": {
+      "label": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "label",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "text_block",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "translate_command",
+    "named": true,
+    "fields": {
+      "destination": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "translate_destination",
+            "named": true
+          }
+        ]
+      },
+      "source": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "translate_source",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "translate_destination",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "translate_source",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "version_argument",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "version_command",
+    "named": true,
+    "fields": {
+      "version": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "version_argument",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "write_command",
+    "named": true,
+    "fields": {
+      "file": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "file_argument",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "write_first_line_command",
+    "named": true,
+    "fields": {
+      "file": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "file_argument",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "write_flag",
+    "named": true,
+    "fields": {
+      "file": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "file_argument",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "+",
+    "named": false
+  },
+  {
+    "type": ",",
+    "named": false
+  },
+  {
+    "type": ":",
+    "named": false
+  },
+  {
+    "type": "I",
+    "named": false
+  },
+  {
+    "type": "M",
+    "named": false
+  },
+  {
+    "type": "Q",
+    "named": false
+  },
+  {
+    "type": "R",
+    "named": false
+  },
+  {
+    "type": "T",
+    "named": false
+  },
+  {
+    "type": "W",
+    "named": false
+  },
+  {
+    "type": "a",
+    "named": false
+  },
+  {
+    "type": "b",
+    "named": false
+  },
+  {
+    "type": "c",
+    "named": false
+  },
+  {
+    "type": "clear_command",
+    "named": true
+  },
+  {
+    "type": "comment_command",
+    "named": true
+  },
+  {
+    "type": "delete_command",
+    "named": true
+  },
+  {
+    "type": "delete_first_line_command",
+    "named": true
+  },
+  {
+    "type": "e",
+    "named": false
+  },
+  {
+    "type": "exchange_command",
+    "named": true
+  },
+  {
+    "type": "file_argument",
+    "named": true
+  },
+  {
+    "type": "file_name_command",
+    "named": true
+  },
+  {
+    "type": "first_line_silent",
+    "named": true
+  },
+  {
+    "type": "g",
+    "named": false
+  },
+  {
+    "type": "get_append_command",
+    "named": true
+  },
+  {
+    "type": "hold_append_command",
+    "named": true
+  },
+  {
+    "type": "hold_command",
+    "named": true
+  },
+  {
+    "type": "i",
+    "named": false
+  },
+  {
+    "type": "l",
+    "named": false
+  },
+  {
+    "type": "last_line_address",
+    "named": true
+  },
+  {
+    "type": "line_number_command",
+    "named": true
+  },
+  {
+    "type": "m",
+    "named": false
+  },
+  {
+    "type": "negation",
+    "named": true
+  },
+  {
+    "type": "next_append_command",
+    "named": true
+  },
+  {
+    "type": "next_command",
+    "named": true
+  },
+  {
+    "type": "p",
+    "named": false
+  },
+  {
+    "type": "print_first_line_command",
+    "named": true
+  },
+  {
+    "type": "q",
+    "named": false
+  },
+  {
+    "type": "r",
+    "named": false
+  },
+  {
+    "type": "s",
+    "named": false
+  },
+  {
+    "type": "shell_command",
+    "named": true
+  },
+  {
+    "type": "t",
+    "named": false
+  },
+  {
+    "type": "v",
+    "named": false
+  },
+  {
+    "type": "w",
+    "named": false
+  },
+  {
+    "type": "y",
+    "named": false
+  },
+  {
+    "type": "{",
+    "named": false
+  },
+  {
+    "type": "}",
+    "named": false
+  },
+  {
+    "type": "~",
+    "named": false
+  }
+]

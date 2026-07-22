@@ -1,0 +1,113 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 19 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'schedule' }}
+
+env:
+  NO_COLOR: "1"
+
+jobs:
+  test:
+    if: github.event_name != 'schedule'
+    name: Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            debug: true
+          - os: macos-15
+            debug: false
+          - os: windows-2022
+            debug: false
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24.18.0
+          cache: npm
+
+      - name: Install dependencies without lifecycle scripts
+        run: npm ci --ignore-scripts
+
+      - name: Audit locked dependencies
+        if: matrix.os == 'ubuntu-24.04'
+        run: npm audit --audit-level=high
+
+      - name: Install verified Tree-sitter CLI
+        run: npm run setup:cli
+
+      - name: Generate and test
+        run: npm run check
+
+      - name: Treat C compiler warnings as errors
+        if: matrix.os == 'ubuntu-24.04'
+        run: >-
+          cc -std=c11 -Wall -Wextra -Wpedantic -Wconversion
+          -Wsign-conversion -Wshadow -Werror -fsyntax-only
+          -Isrc src/parser.c src/scanner.c
+
+      - name: Test debug build
+        if: matrix.debug
+        run: npm run test:debug
+
+  maintenance:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    name: Scheduled fuzz and Wasm
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24.18.0
+          cache: npm
+
+      - name: Install dependencies without lifecycle scripts
+        run: npm ci --ignore-scripts
+
+      - name: Install verified Tree-sitter CLI
+        run: npm run setup:cli
+
+      - name: Run baseline and debug tests
+        run: npm run check && npm run test:debug
+
+      - name: Fuzz corpus with bounded edits
+        run: npm run test:fuzz
+
+      - name: Install verified WASI SDK
+        run: node scripts/install-wasi-sdk.js
+        env:
+          TREE_SITTER_WASI_SDK_PATH: ${{ runner.temp }}/wasi-sdk
+
+      - name: Test Wasm parser
+        run: npm run test:wasm
+        env:
+          TREE_SITTER_WASI_SDK_PATH: ${{ runner.temp }}/wasi-sdk

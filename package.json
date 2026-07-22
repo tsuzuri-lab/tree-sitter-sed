@@ -1,0 +1,62 @@
+{
+  "name": "tree-sitter-sed",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Tree-sitter grammar for POSIX and GNU sed scripts.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tsuzuri-lab/tree-sitter-sed.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tsuzuri-lab/tree-sitter-sed/issues"
+  },
+  "homepage": "https://github.com/tsuzuri-lab/tree-sitter-sed#readme",
+  "packageManager": "npm@11.16.0",
+  "engines": {
+    "node": ">=24.18.0",
+    "npm": ">=11.16.0"
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": ">=24.18.0",
+      "onFail": "error"
+    },
+    "packageManager": {
+      "name": "npm",
+      "version": ">=11.16.0",
+      "onFail": "error"
+    }
+  },
+  "scripts": {
+    "setup:cli": "node scripts/install-tree-sitter.js",
+    "cli": "node scripts/run-tree-sitter.js",
+    "generate": "tree-sitter generate",
+    "check:generated": "node scripts/check-generated.js",
+    "test": "node scripts/run-tree-sitter.js test",
+    "test:debug": "node scripts/run-tree-sitter.js test --debug-build --rebuild",
+    "test:fuzz": "node scripts/run-tree-sitter.js fuzz --iterations 100 --edits 5 --rebuild",
+    "test:wasm": "node scripts/run-tree-sitter.js test --wasm --rebuild",
+    "test:fixtures": "node scripts/test-fixtures.js",
+    "test:crlf": "node scripts/test-crlf.js",
+    "test:eof": "node scripts/test-eof.js",
+    "test:gnu-whitespace": "node scripts/test-gnu-whitespace.js",
+    "test:carriage-return": "node scripts/test-carriage-return.js",
+    "test:dialects": "node scripts/test-dialects.js",
+    "check": "npm run check:generated && npm run test:dialects && npm test && npm run test:fixtures && npm run test:crlf && npm run test:eof && npm run test:gnu-whitespace && npm run test:carriage-return"
+  },
+  "keywords": [
+    "tree-sitter",
+    "sed",
+    "posix",
+    "gnu",
+    "gnu-sed"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "tree-sitter-cli": "0.26.11"
+  },
+  "allowScripts": {
+    "tree-sitter-cli": false
+  }
+}

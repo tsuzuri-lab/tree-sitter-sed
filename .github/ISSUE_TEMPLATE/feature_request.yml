@@ -1,0 +1,27 @@
+name: Feature request
+description: Propose a grammar, query, or project improvement.
+title: ""
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: use_case
+    attributes:
+      label: Use case
+      description: Describe the syntax or workflow that is not supported.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Include a minimal sed example when applicable.
+    validations:
+      required: true
+  - type: textarea
+    id: reference
+    attributes:
+      label: Reference
+      description: Cite a specification, manual, or implementation and version.
+    validations:
+      required: true

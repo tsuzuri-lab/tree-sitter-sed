@@ -1,0 +1,355 @@
+==================
+Regex addresses preserve POSIX bracket-expression boundaries
+==================
+/[[:digit:]/]/p
+/[[.a.]/]/p
+/[[=a=]/]/p
+/[]/]/p
+/[^]/]/p
+/[[]/p
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)))
+
+==================
+Escaped and non-slash regex delimiters
+==================
+/foo\/bar/p
+/a\\/p
+\#foo\#bar#p
+\#[[:digit:]#]#p
+\[foo[p
+s/a\/b/x/
+s#a\#b#x#
+s[foo[bar[
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (escaped_regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (escaped_regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (escaped_regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)))
+    (separator)
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)))
+    (separator)
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)))
+    (separator)))
+
+==================
+POSIX bracket boundaries work with special delimiters
+==================
+/[\]/p
+\.[.].p
+\=[=]=p
+\:[:]:p
+\][]]]p
+\;[;];p
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (escaped_regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (escaped_regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (escaped_regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (escaped_regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (escaped_regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)))
+
+==================
+Empty regex operands retain regex nodes
+==================
+//p
+\##p
+s//x/
+s##x#
+s[[x[
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex)))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (escaped_regex_address
+          pattern: (regex)))
+      body: (print_command))
+    (separator)
+    (command
+      body: (substitute_command
+        pattern: (regex)
+        replacement: (replacement)))
+    (separator)
+    (command
+      body: (substitute_command
+        pattern: (regex)
+        replacement: (replacement)))
+    (separator)
+    (command
+      body: (substitute_command
+        pattern: (regex)
+        replacement: (replacement)))
+    (separator)))
+
+==================
+Unterminated address regex recovers at the next line
+==================
+/unterminated
+p
+
+---
+
+(script
+  (ERROR
+    (regex_content))
+  (command_list
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Unterminated substitute regex recovers at the next line
+==================
+s/unclosed
+d
+
+---
+
+(script
+  (ERROR
+    (regex_content))
+  (command_list
+    (separator)
+    (command
+      body: (delete_command))
+    (separator)))
+
+==================
+Unterminated regex does not poison later delimiter-aware commands
+==================
+/unclosed
+/foo/p
+s/unclosed
+s/foo/x/
+
+---
+
+(script
+  (ERROR
+    (regex_content))
+  (command_list
+    (separator)
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)
+    (ERROR
+      (regex_content))
+    (separator)
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)))
+    (separator)))
+
+==================
+Empty unterminated address regex recovers before another regex
+==================
+/
+/foo/p
+
+---
+
+(script
+  (ERROR
+    (regex_content))
+  (command_list
+    (separator)
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)))
+
+==================
+Empty unterminated substitute pattern recovers before another substitute
+==================
+s/
+s/foo/x/
+
+---
+
+(script
+  (ERROR
+    (regex_content))
+  (command_list
+    (separator)
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)))
+    (separator)))
+
+==================
+Empty unterminated replacement recovers before another substitute
+==================
+s/a/
+s/foo/x/
+
+---
+
+(script
+  (command_list
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)
+        (MISSING _substitute_end)))
+    (separator)
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)))
+    (separator)))

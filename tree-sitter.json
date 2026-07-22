@@ -1,0 +1,42 @@
+{
+  "$schema": "https://tree-sitter.github.io/tree-sitter/assets/schemas/config.schema.json",
+  "grammars": [
+    {
+      "name": "sed",
+      "camelcase": "Sed",
+      "title": "sed",
+      "scope": "source.sed",
+      "file-types": [
+        "sed"
+      ],
+      "highlights": [
+        "queries/highlights.scm"
+      ],
+      "first-line-regex": "^#!.*\\bg?sed\\b",
+      "injection-regex": "^g?sed$"
+    }
+  ],
+  "metadata": {
+    "version": "0.1.0",
+    "license": "MIT",
+    "description": "Tree-sitter grammar for POSIX and GNU sed scripts",
+    "authors": [
+      {
+        "name": "tsuzuri-lab"
+      }
+    ],
+    "links": {
+      "repository": "https://github.com/tsuzuri-lab/tree-sitter-sed"
+    }
+  },
+  "bindings": {
+    "c": false,
+    "go": false,
+    "java": false,
+    "node": false,
+    "python": false,
+    "rust": false,
+    "swift": false,
+    "zig": false
+  }
+}
