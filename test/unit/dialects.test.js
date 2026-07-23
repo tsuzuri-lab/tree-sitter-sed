@@ -99,9 +99,8 @@ test("the POSIX profile exposes only POSIX syntax capabilities", () => {
       addressRulesIncludeLineNumber: syntax.addressRules.includes(
         "line_number_address",
       ),
-      addressRulesIncludePeriodic: syntax.addressRules.includes(
-        "periodic_address",
-      ),
+      addressRulesIncludePeriodic:
+        syntax.addressRules.includes("periodic_address"),
       extendedCommandLoopWhitespace: syntax.extendedCommandLoopWhitespace,
       ignoreCaseFlags: syntax.ignoreCaseFlags,
       listWidth: syntax.listWidth,
@@ -134,8 +133,9 @@ test("the merged profiles expose POSIX and GNU syntax capabilities", () => {
         syntaxCapabilities.rangeEndRules.includes("relative_address"),
       substituteFlagsIncludeExecute:
         syntaxCapabilities.substituteFlagRules.includes("execute_flag"),
-      textArgumentsIncludeInline:
-        syntaxCapabilities.textArgumentRules.includes("_inline_text_argument"),
+      textArgumentsIncludeInline: syntaxCapabilities.textArgumentRules.includes(
+        "_inline_text_argument",
+      ),
     },
     {
       addressRulesIncludePeriodic: true,

@@ -15,9 +15,8 @@ const {
 
 function syntaxRuleChoice($, descriptors) {
   const rules = descriptors.map((descriptor) => {
-    const normalized = typeof descriptor === "string"
-      ? { rule: descriptor }
-      : descriptor;
+    const normalized =
+      typeof descriptor === "string" ? { rule: descriptor } : descriptor;
     const symbol = $[normalized.rule];
     return normalized.alias ? alias(symbol, $[normalized.alias]) : symbol;
   });
@@ -26,18 +25,17 @@ function syntaxRuleChoice($, descriptors) {
 }
 
 function commandBodyChoice($, descriptors) {
-  return choice(...descriptors.map((descriptor) => {
-    const symbol = $[descriptor.rule];
-    return descriptor.alias ? alias(symbol, $[descriptor.alias]) : symbol;
-  }));
+  return choice(
+    ...descriptors.map((descriptor) => {
+      const symbol = $[descriptor.rule];
+      return descriptor.alias ? alias(symbol, $[descriptor.alias]) : symbol;
+    }),
+  );
 }
 
 function optionalCommandLoopWhitespace($) {
   return syntaxCapabilities.extendedCommandLoopWhitespace
-    ? seq(
-      optional($._blanks),
-      optional($._gnu_outer_loop_whitespace),
-    )
+    ? seq(optional($._blanks), optional($._gnu_outer_loop_whitespace))
     : optional($._blanks);
 }
 
@@ -46,19 +44,12 @@ function gnuOuterLoopPadding($) {
 }
 
 function lineContent($, separator, commandSequence) {
-  const forms = [
-    commandSequence,
-    seq(separator, optional(commandSequence)),
-  ];
+  const forms = [commandSequence, seq(separator, optional(commandSequence))];
 
   if (syntaxCapabilities.extendedCommandLoopWhitespace) {
     forms.push(
       gnuOuterLoopPadding($),
-      seq(
-        gnuOuterLoopPadding($),
-        separator,
-        optional(commandSequence),
-      ),
+      seq(gnuOuterLoopPadding($), separator, optional(commandSequence)),
     );
   }
 
@@ -72,11 +63,13 @@ function semicolonSeparator($, run) {
     return separator();
   }
 
-  return prec.right(seq(
-    separator(),
-    repeat(seq($._gnu_outer_loop_whitespace, separator())),
-    optional($._gnu_outer_loop_whitespace),
-  ));
+  return prec.right(
+    seq(
+      separator(),
+      repeat(seq($._gnu_outer_loop_whitespace, separator())),
+      optional($._gnu_outer_loop_whitespace),
+    ),
+  );
 }
 
 const commandForms = {
@@ -96,20 +89,21 @@ function addressedCommand($, descriptors, maxAddresses) {
   const parts = [];
 
   if (maxAddresses > 0) {
-    parts.push(optional(seq(
-      field(
-        "addresses",
-        maxAddresses === 1 ? $.address : choice($.address_range, $.address),
+    parts.push(
+      optional(
+        seq(
+          field(
+            "addresses",
+            maxAddresses === 1 ? $.address : choice($.address_range, $.address),
+          ),
+          optional($._blanks),
+        ),
       ),
-      optional($._blanks),
-    )));
+    );
   }
 
   parts.push(
-    optional(seq(
-      field("negation", $.negation),
-      optional($._blanks),
-    )),
+    optional(seq(field("negation", $.negation), optional($._blanks))),
     field("body", commandBodyChoice($, descriptors)),
   );
 
@@ -120,7 +114,8 @@ function commandsForTermination($, termination) {
   const forms = commandForms[termination]
     .filter(([group]) => commandGroups[group].length > 0)
     .map(([group, maxAddresses]) =>
-      addressedCommand($, commandGroups[group], maxAddresses));
+      addressedCommand($, commandGroups[group], maxAddresses),
+    );
 
   return forms.length === 1 ? forms[0] : choice(...forms);
 }
@@ -213,7 +208,10 @@ module.exports = grammar({
         repeat(seq($._chainable_command_item, $._block_semicolon_separator)),
         choice(
           seq($._chainable_command_item, $._trailing_comment_item),
-          seq($._chainable_command_item, optional($._block_semicolon_separator)),
+          seq(
+            $._chainable_command_item,
+            optional($._block_semicolon_separator),
+          ),
           $._line_terminated_command_item,
           $._comment_item,
         ),
@@ -234,24 +232,17 @@ module.exports = grammar({
     _comment_item: ($) =>
       seq(
         optionalCommandLoopWhitespace($),
-        optional(seq(
-          field("negation", $.negation),
-          optional($._blanks),
-        )),
+        optional(seq(field("negation", $.negation), optional($._blanks))),
         $.comment_command,
       ),
 
-    _trailing_comment_item: ($) =>
-      seq(optional($._blanks), $.comment_command),
+    _trailing_comment_item: ($) => seq(optional($._blanks), $.comment_command),
 
-    _line_end: ($) =>
-      seq(optional($._blanks), $._line_separator),
+    _line_end: ($) => seq(optional($._blanks), $._line_separator),
 
-    _line_separator: ($) =>
-      alias($._newline, $.separator),
+    _line_separator: ($) => alias($._newline, $.separator),
 
-    _semicolon_separator: ($) =>
-      semicolonSeparator($, $._semicolon_run),
+    _semicolon_separator: ($) => semicolonSeparator($, $._semicolon_run),
 
     _block_semicolon_separator: ($) =>
       semicolonSeparator($, $._block_semicolon_run),
@@ -264,17 +255,11 @@ module.exports = grammar({
 
     _block_semicolon_run: () => token(/[ \t]*(;[ \t]*)+/),
 
-    command: ($) =>
-      choice(
-        $._chainable_command,
-        $._line_terminated_command,
-      ),
+    command: ($) => choice($._chainable_command, $._line_terminated_command),
 
-    _chainable_command: ($) =>
-      commandsForTermination($, "chainable"),
+    _chainable_command: ($) => commandsForTermination($, "chainable"),
 
-    _line_terminated_command: ($) =>
-      commandsForTermination($, "line"),
+    _line_terminated_command: ($) => commandsForTermination($, "line"),
 
     address_range: ($) =>
       seq(
@@ -282,14 +267,10 @@ module.exports = grammar({
         optional($._blanks),
         ",",
         optional($._blanks),
-        field(
-          "end",
-          syntaxRuleChoice($, syntaxCapabilities.rangeEndRules),
-        ),
+        field("end", syntaxRuleChoice($, syntaxCapabilities.rangeEndRules)),
       ),
 
-    address: ($) =>
-      syntaxRuleChoice($, syntaxCapabilities.addressRules),
+    address: ($) => syntaxRuleChoice($, syntaxCapabilities.addressRules),
 
     line_number_address: () => /\d+/,
 
@@ -325,10 +306,12 @@ module.exports = grammar({
       seq(
         optional($._blanks),
         syntaxRuleChoice($, syntaxCapabilities.regexAddressFlags),
-        repeat(seq(
-          optional($._blanks),
-          syntaxRuleChoice($, syntaxCapabilities.regexAddressFlags),
-        )),
+        repeat(
+          seq(
+            optional($._blanks),
+            syntaxRuleChoice($, syntaxCapabilities.regexAddressFlags),
+          ),
+        ),
       ),
 
     negation: () => "!",
@@ -340,12 +323,9 @@ module.exports = grammar({
     quit_command: ($) =>
       syntaxCapabilities.quitStatus
         ? seq(
-          "q",
-          optional(seq(
-            optional($._blanks),
-            field("status", $.exit_status),
-          )),
-        )
+            "q",
+            optional(seq(optional($._blanks), field("status", $.exit_status))),
+          )
         : "q",
 
     next_command: () => "n",
@@ -371,12 +351,11 @@ module.exports = grammar({
     list_command: ($) =>
       syntaxCapabilities.listWidth
         ? seq(
-          "l",
-          optional(seq(
-            optional($._blanks),
-            field("width", $.line_wrap_length),
-          )),
-        )
+            "l",
+            optional(
+              seq(optional($._blanks), field("width", $.line_wrap_length)),
+            ),
+          )
         : "l",
 
     read_command: ($) =>
@@ -404,14 +383,13 @@ module.exports = grammar({
       ),
 
     _block_line_content: ($) =>
-      lineContent(
-        $,
-        $._block_semicolon_separator,
-        $._block_command_sequence,
-      ),
+      lineContent($, $._block_semicolon_separator, $._block_command_sequence),
 
     substitute_command: ($) =>
-      choice($._substitute_command_without_write, $._substitute_command_with_write),
+      choice(
+        $._substitute_command_without_write,
+        $._substitute_command_with_write,
+      ),
 
     _substitute_command_without_write: ($) =>
       seq(
@@ -419,17 +397,27 @@ module.exports = grammar({
         field("pattern", alias($._substitute_pattern, $.regex)),
         optional(field("replacement", $.replacement)),
         $._substitute_end,
-        optional(field("flags", alias($._substitute_flags_without_write, $.substitute_flags))),
+        optional(
+          field(
+            "flags",
+            alias($._substitute_flags_without_write, $.substitute_flags),
+          ),
+        ),
       ),
 
     _substitute_command_with_write: ($) =>
-      prec.right(seq(
-        "s",
-        field("pattern", alias($._substitute_pattern, $.regex)),
-        optional(field("replacement", $.replacement)),
-        $._substitute_end,
-        field("flags", alias($._substitute_flags_with_write, $.substitute_flags)),
-      )),
+      prec.right(
+        seq(
+          "s",
+          field("pattern", alias($._substitute_pattern, $.regex)),
+          optional(field("replacement", $.replacement)),
+          $._substitute_end,
+          field(
+            "flags",
+            alias($._substitute_flags_with_write, $.substitute_flags),
+          ),
+        ),
+      ),
 
     translate_command: ($) =>
       seq(
@@ -491,27 +479,18 @@ module.exports = grammar({
       seq(":", optional($._blanks), field("label", $.label)),
 
     branch_command: ($) =>
-      seq(
-        "b",
-        optional(seq(optional($._blanks), field("label", $.label))),
-      ),
+      seq("b", optional(seq(optional($._blanks), field("label", $.label)))),
 
     test_command: ($) =>
-      seq(
-        "t",
-        optional(seq(optional($._blanks), field("label", $.label))),
-      ),
+      seq("t", optional(seq(optional($._blanks), field("label", $.label)))),
 
     label: ($) => $._line_word,
 
-    append_command: ($) =>
-      seq("a", $._text_argument),
+    append_command: ($) => seq("a", $._text_argument),
 
-    insert_command: ($) =>
-      seq("i", $._text_argument),
+    insert_command: ($) => seq("i", $._text_argument),
 
-    change_command: ($) =>
-      seq("c", $._text_argument),
+    change_command: ($) => seq("c", $._text_argument),
 
     _text_argument: ($) =>
       syntaxRuleChoice($, syntaxCapabilities.textArgumentRules),

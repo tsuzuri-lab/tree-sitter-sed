@@ -14,7 +14,9 @@ const allowedDownloadHosts = new Set([
 
 async function downloadVerified({ url, destination, sha256, maxBytes }) {
   if (!/^[0-9a-f]{64}$/.test(sha256)) {
-    throw new Error("Expected SHA-256 must be 64 lowercase hexadecimal characters");
+    throw new Error(
+      "Expected SHA-256 must be 64 lowercase hexadecimal characters",
+    );
   }
 
   await mkdir(dirname(destination), { recursive: true });
@@ -38,7 +40,9 @@ async function downloadVerified({ url, destination, sha256, maxBytes }) {
 
   const advertisedLength = Number(response.headers.get("content-length"));
   if (Number.isFinite(advertisedLength) && advertisedLength > maxBytes) {
-    throw new Error(`Download is larger than the ${maxBytes}-byte safety limit`);
+    throw new Error(
+      `Download is larger than the ${maxBytes}-byte safety limit`,
+    );
   }
 
   const hash = createHash("sha256");
@@ -84,7 +88,9 @@ async function downloadVerified({ url, destination, sha256, maxBytes }) {
   const persisted = await hashFile(destination);
   if (persisted !== sha256) {
     await unlink(destination).catch(() => {});
-    throw new Error(`Persisted SHA-256 mismatch: expected ${sha256}, received ${persisted}`);
+    throw new Error(
+      `Persisted SHA-256 mismatch: expected ${sha256}, received ${persisted}`,
+    );
   }
 }
 

@@ -16,7 +16,9 @@ function repositoryPaths() {
     throw result.error;
   }
   if (result.status !== 0) {
-    throw new Error(result.stderr.trim() || `git ls-files exited with ${result.status}`);
+    throw new Error(
+      result.stderr.trim() || `git ls-files exited with ${result.status}`,
+    );
   }
   return result.stdout.split("\0").filter(Boolean);
 }
@@ -29,7 +31,9 @@ function fileFingerprint(path) {
       return `link:${stat.mode}:${readlinkSync(fullPath)}`;
     }
     if (stat.isFile()) {
-      const hash = createHash("sha256").update(readFileSync(fullPath)).digest("hex");
+      const hash = createHash("sha256")
+        .update(readFileSync(fullPath))
+        .digest("hex");
       return `file:${stat.mode}:${stat.size}:${hash}`;
     }
     return `other:${stat.mode}`;
@@ -42,7 +46,9 @@ function fileFingerprint(path) {
 }
 
 function snapshot() {
-  return new Map(repositoryPaths().map((path) => [path, fileFingerprint(path)]));
+  return new Map(
+    repositoryPaths().map((path) => [path, fileFingerprint(path)]),
+  );
 }
 
 function changedPaths(before, after) {
@@ -67,7 +73,9 @@ const result = spawnSync(executable, ["generate"], {
 
 if (result.error) {
   if (result.error.code === "ENOENT") {
-    console.error("Tree-sitter CLI is missing; run npm run setup:cli after npm ci.");
+    console.error(
+      "Tree-sitter CLI is missing; run npm run setup:cli after npm ci.",
+    );
     process.exit(1);
   }
   throw result.error;
@@ -82,6 +90,8 @@ if (changed.length > 0) {
   for (const path of changed) {
     console.error(`  ${path}`);
   }
-  console.error("Review and commit the regenerated files, then run the check again.");
+  console.error(
+    "Review and commit the regenerated files, then run the check again.",
+  );
   process.exit(1);
 }

@@ -45,7 +45,9 @@ try {
 
 if (result.error) {
   if (result.error.code === "ENOENT") {
-    console.error("Tree-sitter CLI is missing; run npm run setup:cli after npm ci.");
+    console.error(
+      "Tree-sitter CLI is missing; run npm run setup:cli after npm ci.",
+    );
     process.exit(1);
   }
   throw result.error;

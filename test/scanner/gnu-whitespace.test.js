@@ -1,10 +1,7 @@
 const assert = require("node:assert/strict");
 const { after, test } = require("node:test");
 const { CR, FF, TAB, VT } = require("../support/source");
-const {
-  createParserHarness,
-  nodeCounts,
-} = require("../support/tree-sitter");
+const { createParserHarness, nodeCounts } = require("../support/tree-sitter");
 
 const parser = createParserHarness("gnu-whitespace");
 after(() => parser.close());

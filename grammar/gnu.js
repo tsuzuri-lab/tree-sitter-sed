@@ -34,20 +34,12 @@ module.exports = {
     step_value: () => /\d+/,
 
     relative_address: ($) =>
-      seq(
-        "+",
-        optional($._blanks),
-        field("offset", $.line_offset),
-      ),
+      seq("+", optional($._blanks), field("offset", $.line_offset)),
 
     line_offset: () => /\d+/,
 
     next_multiple_address: ($) =>
-      seq(
-        "~",
-        optional($._blanks),
-        field("multiple", $.step_value),
-      ),
+      seq("~", optional($._blanks), field("multiple", $.step_value)),
 
     _address_ignore_case_flag: () => "I",
 
@@ -56,10 +48,7 @@ module.exports = {
     silent_quit_command: ($) =>
       seq(
         "Q",
-        optional(seq(
-          optional($._blanks),
-          field("status", $.exit_status),
-        )),
+        optional(seq(optional($._blanks), field("status", $.exit_status))),
       ),
 
     exit_status: () => /\d+/,
@@ -77,18 +66,14 @@ module.exports = {
       seq("W", optional($._blanks), field("file", $.file_argument)),
 
     test_failure_command: ($) =>
-      seq(
-        "T",
-        optional(seq(optional($._blanks), field("label", $.label))),
-      ),
+      seq("T", optional(seq(optional($._blanks), field("label", $.label)))),
 
     version_command: ($) =>
       seq(
         "v",
-        optional(seq(
-          optional($._blanks),
-          field("version", $.version_argument),
-        )),
+        optional(
+          seq(optional($._blanks), field("version", $.version_argument)),
+        ),
       ),
 
     version_argument: ($) => $._line_word,
@@ -100,10 +85,7 @@ module.exports = {
     execute_command: ($) =>
       seq(
         "e",
-        optional(seq(
-          optional($._blanks),
-          field("command", $.shell_command),
-        )),
+        optional(seq(optional($._blanks), field("command", $.shell_command))),
       ),
 
     _inline_text_argument: ($) =>

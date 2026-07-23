@@ -1,10 +1,7 @@
 const assert = require("node:assert/strict");
 const { after, test } = require("node:test");
 const { CRLF, joinLines } = require("../support/source");
-const {
-  createParserHarness,
-  nodeCounts,
-} = require("../support/tree-sitter");
+const { createParserHarness, nodeCounts } = require("../support/tree-sitter");
 
 const parser = createParserHarness("crlf");
 after(() => parser.close());
@@ -85,15 +82,7 @@ const cases = [
   },
   {
     name: "parses GNU address forms separated by CRLF",
-    lines: [
-      "0~2p",
-      "50~0p",
-      "1,+3p",
-      "/x/,+2p",
-      "/x/,~4p",
-      "/x/IMp",
-      "",
-    ],
+    lines: ["0~2p", "50~0p", "1,+3p", "/x/,+2p", "/x/,~4p", "/x/IMp", ""],
     expected: {
       print_command: 6,
       periodic_address: 2,

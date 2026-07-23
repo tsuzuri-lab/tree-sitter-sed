@@ -1,10 +1,7 @@
 const assert = require("node:assert/strict");
 const { after, test } = require("node:test");
 const { CR, VT, applyEdits } = require("../support/source");
-const {
-  createParserHarness,
-  nodeTexts,
-} = require("../support/tree-sitter");
+const { createParserHarness, nodeTexts } = require("../support/tree-sitter");
 
 const parser = createParserHarness("carriage-return");
 const backslash = "\\";
@@ -238,8 +235,7 @@ test("distinguishes bare carriage returns from CRLF separators", async (t) => {
     },
     {
       name: "excludes carriage returns that belong to CRLF separators",
-      source:
-        "#x\r\nbfoo\r\nr file\r\ne echo\r\na text\r\np\n",
+      source: "#x\r\nbfoo\r\nr file\r\ne echo\r\na text\r\np\n",
       expected: {
         comment_command: ["#x"],
         label: ["foo"],

@@ -77,7 +77,8 @@ async function main() {
   }
 
   const packageDirectory = dirname(packageJsonPath);
-  const executableName = process.platform === "win32" ? "tree-sitter.exe" : "tree-sitter";
+  const executableName =
+    process.platform === "win32" ? "tree-sitter.exe" : "tree-sitter";
   const executablePath = join(packageDirectory, executableName);
   const temporaryDirectory = mkdtempSync(join(tmpdir(), "tree-sitter-cli-"));
   const archivePath = join(temporaryDirectory, basename(asset[0]));
@@ -109,7 +110,10 @@ async function main() {
       windowsHide: true,
     });
     const output = `${result.stdout ?? ""}${result.stderr ?? ""}`.trim();
-    if (result.status !== 0 || !new RegExp(`^tree-sitter ${version}(?:\\s|$)`).test(output)) {
+    if (
+      result.status !== 0 ||
+      !new RegExp(`^tree-sitter ${version}(?:\\s|$)`).test(output)
+    ) {
       rmSync(executablePath, { force: true });
       throw new Error(`Installed CLI failed version verification: ${output}`);
     }

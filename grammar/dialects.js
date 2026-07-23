@@ -61,7 +61,8 @@ function mergeProfiles(...profiles) {
       }
 
       if (
-        previous.alias && descriptor.alias &&
+        previous.alias &&
+        descriptor.alias &&
         previous.alias !== descriptor.alias
       ) {
         throw new Error(

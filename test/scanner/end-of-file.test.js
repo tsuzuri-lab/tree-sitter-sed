@@ -1,9 +1,6 @@
 const assert = require("node:assert/strict");
 const { after, test } = require("node:test");
-const {
-  createParserHarness,
-  nodeTexts,
-} = require("../support/tree-sitter");
+const { createParserHarness, nodeTexts } = require("../support/tree-sitter");
 
 const parser = createParserHarness("end-of-file");
 after(() => parser.close());

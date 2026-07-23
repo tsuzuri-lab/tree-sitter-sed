@@ -6,12 +6,8 @@
       "camelcase": "Sed",
       "title": "sed",
       "scope": "source.sed",
-      "file-types": [
-        "sed"
-      ],
-      "highlights": [
-        "queries/highlights.scm"
-      ],
+      "file-types": ["sed"],
+      "highlights": ["queries/highlights.scm"],
       "first-line-regex": "^#!.*\\bg?sed\\b",
       "injection-regex": "^g?sed$"
     }
