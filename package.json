@@ -2,7 +2,7 @@
   "name": "tree-sitter-sed",
   "version": "0.1.0",
   "private": true,
-  "description": "Tree-sitter grammar for POSIX and GNU sed scripts.",
+  "description": "Tree-sitter grammar for sed scripts, covering POSIX.1-2024 syntax and GNU sed extensions.",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tsuzuri-lab/tree-sitter-sed.git"

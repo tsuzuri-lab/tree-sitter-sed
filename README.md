@@ -2,8 +2,8 @@
 
 [![CI](https://github.com/tsuzuri-lab/tree-sitter-sed/actions/workflows/ci.yml/badge.svg)](https://github.com/tsuzuri-lab/tree-sitter-sed/actions/workflows/ci.yml)
 
-A [Tree-sitter](https://tree-sitter.github.io/tree-sitter/) grammar for `sed`,
-based on POSIX.1-2024 and GNU `sed` 4.10.
+A [Tree-sitter](https://tree-sitter.github.io/tree-sitter/) grammar for `sed`
+scripts, covering POSIX.1-2024 syntax and GNU `sed` 4.10 extensions.
 
 This is a pre-1.0, source-only project. Generated C sources and highlighting
 queries are included; language bindings and registry packages are not. Named
@@ -11,9 +11,9 @@ nodes may change between 0.x releases.
 
 ## Compatibility
 
-The parser accepts a POSIX/GNU superset and does not provide a runtime dialect
-switch. GNU commands, addresses, modifiers, inline text, whitespace, and
-separator extensions are supported.
+The parser accepts POSIX.1-2024 syntax plus GNU commands, addresses, modifiers,
+inline text, whitespace, and separator extensions. It does not provide a
+runtime dialect switch.
 
 - Regular expressions and shell commands are opaque nodes. Their internal
   syntax and other semantic constraints are not validated.
