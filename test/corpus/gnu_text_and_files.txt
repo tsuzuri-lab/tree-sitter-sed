@@ -1,0 +1,382 @@
+==================
+Keeps semicolons, comments, and braces inside GNU filenames
+==================
+r input;#}
+R input;#}
+w output;#}
+W output;#}
+s/a/b/w substitution;#}
+
+---
+
+(script
+  (command_list
+    (command
+      body: (read_command
+        file: (file_argument)))
+    (separator)
+    (command
+      body: (read_line_command
+        file: (file_argument)))
+    (separator)
+    (command
+      body: (write_command
+        file: (file_argument)))
+    (separator)
+    (command
+      body: (write_first_line_command
+        file: (file_argument)))
+    (separator)
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)
+        flags: (substitute_flags
+          (write_flag
+            file: (file_argument)))))
+    (separator)))
+
+==================
+Keeps semicolons, comments, and braces inside GNU shell text
+==================
+e echo one; echo two # }
+
+---
+
+(script
+  (command_list
+    (command
+      body: (execute_command
+        command: (shell_command)))
+    (separator)))
+
+==================
+Keeps semicolons, comments, and braces inside GNU inline text
+==================
+a inline ; # }
+i inline ; # }
+c inline ; # }
+
+---
+
+(script
+  (command_list
+    (command
+      body: (append_command
+        text: (text_block)))
+    (separator)
+    (command
+      body: (insert_command
+        text: (text_block)))
+    (separator)
+    (command
+      body: (change_command
+        text: (text_block)))
+    (separator)))
+
+==================
+Keeps apparent closing braces inside line-consuming block commands
+==================
+{
+  r file}
+}
+{
+  e echo }
+}
+{
+  a text}
+}
+p
+
+---
+
+(script
+  (command_list
+    (command
+      body: (block_command
+        (command_list
+          (separator)
+          (command
+            body: (read_command
+              file: (file_argument)))
+          (separator))))
+    (separator)
+    (command
+      body: (block_command
+        (command_list
+          (separator)
+          (command
+            body: (execute_command
+              command: (shell_command)))
+          (separator))))
+    (separator)
+    (command
+      body: (block_command
+        (command_list
+          (separator)
+          (command
+            body: (append_command
+              text: (text_block)))
+          (separator))))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Continues GNU append text after an odd trailing backslash run
+==================
+a\
+first\
+second
+p
+a\\\
+continued
+p
+
+---
+
+(script
+  (command_list
+    (command
+      body: (append_command
+        text: (text_block)))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)
+    (command
+      body: (append_command
+        text: (text_block)))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Ends GNU append text after an even trailing backslash run
+==================
+a\\
+p
+
+---
+
+(script
+  (command_list
+    (command
+      body: (append_command
+        text: (text_block)))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Parses GNU inline and empty text arguments
+==================
+i same line
+c
+p
+
+---
+
+(script
+  (command_list
+    (command
+      body: (insert_command
+        text: (text_block)))
+    (separator)
+    (command
+      body: (change_command
+        text: (text_block)))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Continues GNU shell text after an odd trailing backslash run
+==================
+e\
+echo one
+p
+e\\\
+continued
+p
+
+---
+
+(script
+  (command_list
+    (command
+      body: (execute_command
+        command: (shell_command)))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)
+    (command
+      body: (execute_command
+        command: (shell_command)))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Ends GNU shell text after an even trailing backslash run
+==================
+e\\
+p
+
+---
+
+(script
+  (command_list
+    (command
+      body: (execute_command
+        command: (shell_command)))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Allows escaped newlines in GNU regex, substitute, and translate operands
+==================
+/foo\
+bar/p
+\#route\
+name#p
+s/foo\
+bar/baz/
+y/a\
+b/cd/
+y/ab/c\
+d/
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (escaped_regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)))
+    (separator)
+    (command
+      body: (translate_command
+        source: (translate_source)
+        destination: (translate_destination)))
+    (separator)
+    (command
+      body: (translate_command
+        source: (translate_source)
+        destination: (translate_destination)))
+    (separator)))
+
+==================
+Parses a GNU read filename without a separating blank
+==================
+rfile
+p
+
+---
+
+(script
+  (command_list
+    (command
+      body: (read_command
+        file: (file_argument)))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Parses a GNU write filename without a separating blank
+==================
+wout
+p
+
+---
+
+(script
+  (command_list
+    (command
+      body: (write_command
+        file: (file_argument)))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Parses a GNU substitute write filename without a separating blank
+==================
+s/a/b/wout
+p
+
+---
+
+(script
+  (command_list
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)
+        flags: (substitute_flags
+          (write_flag
+            file: (file_argument)))))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Parses an empty GNU inline append argument
+==================
+a
+p
+
+---
+
+(script
+  (command_list
+    (command
+      body: (append_command
+        text: (text_block)))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Parses an empty GNU backslash text argument at end of file
+==================
+a\
+
+---
+
+(script
+  (command_list
+    (command
+      body: (append_command
+        text: (text_block)))))

@@ -1,0 +1,449 @@
+==================
+Rejects a bare label and recovers at the next line
+==================
+:
+p
+
+---
+
+(script
+  (ERROR)
+  (command_list
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Rejects adjacent POSIX commands without a separator
+==================
+dp
+d p
+
+---
+
+(script
+  (ERROR
+    (command
+      body: (delete_command)))
+  (command_list
+    (command
+      body: (print_command))
+    (separator)
+    (ERROR
+      (command
+        body: (delete_command)))
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Recovers on later lines after missing POSIX separators
+==================
+dp
+p
+d p
+p
+
+---
+
+(script
+  (ERROR
+    (command
+      body: (delete_command)))
+  (command_list
+    (command
+      body: (print_command))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)
+    (ERROR
+      (command
+        body: (delete_command)))
+    (command
+      body: (print_command))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Recovers inside a POSIX block after adjacent commands
+==================
+{
+  dp
+  p
+}
+
+---
+
+(script
+  (command_list
+    (command
+      body: (block_command
+        (command_list
+          (separator)
+          (command
+            body: (delete_command))
+          (ERROR)
+          (separator)
+          (command
+            body: (print_command))
+          (separator))))
+    (separator)))
+
+==================
+Rejects address ranges on GNU quit commands and recovers
+==================
+1,2q
+p
+1,2Q
+p
+
+---
+
+(script
+  (ERROR
+    (address_range
+      start: (address
+        (line_number_address))
+      end: (address
+        (line_number_address))))
+  (command_list
+    (command
+      body: (quit_command))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)
+    (ERROR
+      (address_range
+        start: (address
+          (line_number_address))
+        end: (address
+          (line_number_address))))
+    (command
+      body: (silent_quit_command))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Rejects missing GNU file arguments and recovers at each next line
+==================
+r
+p
+R
+p
+w
+p
+W
+p
+s/a/b/w
+p
+
+---
+
+(script
+  (ERROR)
+  (command_list
+    (separator)
+    (command
+      body: (print_command))
+    (separator)
+    (ERROR)
+    (separator)
+    (command
+      body: (print_command))
+    (separator)
+    (ERROR)
+    (separator)
+    (command
+      body: (print_command))
+    (separator)
+    (ERROR)
+    (separator)
+    (command
+      body: (print_command))
+    (separator)
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)))
+    (ERROR)
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Rejects adjacent commands at top level and inside a GNU compact block
+==================
+dp
+p
+{dp}
+p
+
+---
+
+(script
+  (ERROR
+    (command
+      body: (delete_command)))
+  (command_list
+    (command
+      body: (print_command))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)
+    (command
+      body: (block_command
+        (ERROR
+          (command
+            body: (delete_command)))
+        (command_list
+          (command
+            body: (print_command)))))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Reports a missing block terminator when GNU shell text consumes the brace
+==================
+{e echo}
+p
+
+---
+
+(script
+  (command_list
+    (command
+      body: (block_command
+        (command_list
+          (command
+            body: (execute_command
+              command: (shell_command)))
+          (separator)
+          (command
+            body: (print_command))
+          (separator))
+        (MISSING "}")))))
+
+==================
+Rejects a GNU relative address without a range start and recovers
+==================
++2p
+p
+
+---
+
+(script
+  (ERROR)
+  (command_list
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Rejects a GNU periodic address without a step and recovers
+==================
+1~p
+p
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address
+        (line_number_address))
+      (ERROR)
+      body: (print_command))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Reports a missing GNU relative range offset and recovers
+==================
+1,+p
+p
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address_range
+        start: (address
+          (line_number_address))
+        end: (relative_address
+          offset: (line_offset
+            (MISSING "line_number_address_token1"))))
+      body: (print_command))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Reports a missing GNU next-multiple value and recovers
+==================
+1,~p
+p
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address_range
+        start: (address
+          (line_number_address))
+        end: (next_multiple_address
+          multiple: (step_value
+            (MISSING "line_number_address_token1"))))
+      body: (print_command))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Recovers at the next line after an unterminated regex address
+==================
+/x
+p
+
+---
+
+(script
+  (ERROR
+    (regex_content))
+  (command_list
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Recovers at the next line after an unterminated substitute pattern
+==================
+s/unclosed
+d
+
+---
+
+(script
+  (ERROR
+    (regex_content))
+  (command_list
+    (separator)
+    (command
+      body: (delete_command))
+    (separator)))
+
+==================
+Resets delimiter state after unterminated regex operands
+==================
+/unclosed
+/foo/p
+s/unclosed
+s/foo/x/
+
+---
+
+(script
+  (ERROR
+    (regex_content))
+  (command_list
+    (separator)
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)
+    (ERROR
+      (regex_content))
+    (separator)
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)))
+    (separator)))
+
+==================
+Recovers from an empty unterminated address before another regex
+==================
+/
+/foo/p
+
+---
+
+(script
+  (ERROR
+    (regex_content))
+  (command_list
+    (separator)
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)))
+
+==================
+Recovers from an empty unterminated pattern before another substitute
+==================
+s/
+s/foo/x/
+
+---
+
+(script
+  (ERROR
+    (regex_content))
+  (command_list
+    (separator)
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)))
+    (separator)))
+
+==================
+Inserts a missing delimiter for an empty unterminated replacement
+==================
+s/a/
+s/foo/x/
+
+---
+
+(script
+  (command_list
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)
+        (MISSING _substitute_end)))
+    (separator)
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)))
+    (separator)))

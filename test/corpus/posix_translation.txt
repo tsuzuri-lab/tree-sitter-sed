@@ -1,0 +1,68 @@
+==================
+Parses a slash-delimited translate command
+==================
+y/abc/ABC/
+
+---
+
+(script
+  (command_list
+    (command
+      body: (translate_command
+        source: (translate_source)
+        destination: (translate_destination)))
+    (separator)))
+
+==================
+Starts another command after a completed translate command
+==================
+y/abc/ABC/;p
+
+---
+
+(script
+  (command_list
+    (command
+      body: (translate_command
+        source: (translate_source)
+        destination: (translate_destination)))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Parses a translate command with an alternate delimiter
+==================
+y#/#_#
+
+---
+
+(script
+  (command_list
+    (command
+      body: (translate_command
+        source: (translate_source)
+        destination: (translate_destination)))
+    (separator)))
+
+==================
+Keeps blanks and delimiter characters inside translate operands
+==================
+y/ /_/
+y#/#_#
+
+---
+
+(script
+  (command_list
+    (command
+      body: (translate_command
+        source: (translate_source)
+        destination: (translate_destination)))
+    (separator)
+    (command
+      body: (translate_command
+        source: (translate_source)
+        destination: (translate_destination)))
+    (separator)))

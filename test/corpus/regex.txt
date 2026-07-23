@@ -1,0 +1,430 @@
+==================
+Parses hash-delimited regex addresses and negation
+==================
+\#^route:/api/#p
+\#^/api/#p
+\#x#!d
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address
+        (escaped_regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (escaped_regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (escaped_regex_address
+          pattern: (regex
+            body: (regex_content))))
+      negation: (negation)
+      body: (delete_command))
+    (separator)))
+
+==================
+Parses at-sign and pipe-delimited regex addresses
+==================
+\@^/api/@p
+\|a/b|d
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address
+        (escaped_regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (escaped_regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (delete_command))
+    (separator)))
+
+==================
+Keeps literal blanks inside a regex address
+==================
+/ a /p
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)))
+
+==================
+Keeps literal brackets and a POSIX character class inside regex addresses
+==================
+/[]]/p
+/[[]/p
+/[[:digit:]]/p
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)))
+
+==================
+Does not end a regex inside a POSIX character class
+==================
+/[[:digit:]/]/p
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)))
+
+==================
+Does not end a regex inside a POSIX collating-symbol expression
+==================
+/[[.a.]/]/p
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)))
+
+==================
+Does not end a regex inside a POSIX equivalence-class expression
+==================
+/[[=a=]/]/p
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)))
+
+==================
+Keeps a closing bracket literal at the start of a bracket expression
+==================
+/[]/]/p
+/[^]/]/p
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)))
+
+==================
+Keeps an opening bracket literal inside a bracket expression
+==================
+/[[]/p
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)))
+
+==================
+Keeps escaped slash delimiters inside slash regex addresses
+==================
+/foo\/bar/p
+/a\\/p
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)))
+
+==================
+Keeps escaped alternate delimiters inside regex addresses
+==================
+\#foo\#bar#p
+\#[[:digit:]#]#p
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address
+        (escaped_regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (escaped_regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)))
+
+==================
+Accepts an opening bracket as an alternate regex delimiter
+==================
+\[foo[p
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address
+        (escaped_regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)))
+
+==================
+Keeps escaped delimiters inside substitute patterns
+==================
+s/a\/b/x/
+s#a\#b#x#
+
+---
+
+(script
+  (command_list
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)))
+    (separator)
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)))
+    (separator)))
+
+==================
+Accepts an opening bracket as a substitute delimiter
+==================
+s[foo[bar[
+
+---
+
+(script
+  (command_list
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)))
+    (separator)))
+
+==================
+Keeps a semicolon inside a substitute bracket expression
+==================
+s/a[;]b/c/
+
+---
+
+(script
+  (command_list
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)))
+    (separator)))
+
+==================
+Distinguishes a slash delimiter from a backslash bracket expression
+==================
+/[\]/p
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)))
+
+==================
+Distinguishes punctuation delimiters from matching bracket contents
+==================
+\.[.].p
+\=[=]=p
+\:[:]:p
+\][]]]p
+\;[;];p
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address
+        (escaped_regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (escaped_regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (escaped_regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (escaped_regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (escaped_regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)))
+
+==================
+Retains regex nodes for empty address and substitute patterns
+==================
+//p
+\##p
+s//x/
+s##x#
+s[[x[
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex)))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (escaped_regex_address
+          pattern: (regex)))
+      body: (print_command))
+    (separator)
+    (command
+      body: (substitute_command
+        pattern: (regex)
+        replacement: (replacement)))
+    (separator)
+    (command
+      body: (substitute_command
+        pattern: (regex)
+        replacement: (replacement)))
+    (separator)
+    (command
+      body: (substitute_command
+        pattern: (regex)
+        replacement: (replacement)))
+    (separator)))

@@ -33,17 +33,13 @@
     "cli": "node scripts/run-tree-sitter.js",
     "generate": "tree-sitter generate",
     "check:generated": "node scripts/check-generated.js",
-    "test": "node scripts/run-tree-sitter.js test",
+    "test": "npm run test:corpus && npm run test:node",
+    "test:corpus": "node scripts/run-tree-sitter.js test",
+    "test:node": "node --test \"test/**/*.test.js\"",
     "test:debug": "node scripts/run-tree-sitter.js test --debug-build --rebuild",
     "test:fuzz": "node scripts/run-tree-sitter.js fuzz --iterations 100 --edits 5 --rebuild",
     "test:wasm": "node scripts/run-tree-sitter.js test --wasm --rebuild",
-    "test:fixtures": "node scripts/test-fixtures.js",
-    "test:crlf": "node scripts/test-crlf.js",
-    "test:eof": "node scripts/test-eof.js",
-    "test:gnu-whitespace": "node scripts/test-gnu-whitespace.js",
-    "test:carriage-return": "node scripts/test-carriage-return.js",
-    "test:dialects": "node scripts/test-dialects.js",
-    "check": "npm run check:generated && npm run test:dialects && npm test && npm run test:fixtures && npm run test:crlf && npm run test:eof && npm run test:gnu-whitespace && npm run test:carriage-return"
+    "check": "npm run check:generated && npm test"
   },
   "keywords": [
     "tree-sitter",

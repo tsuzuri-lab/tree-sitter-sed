@@ -1,0 +1,320 @@
+==================
+Parses GNU filename and pattern-space clearing commands
+==================
+F
+z
+
+---
+
+(script
+  (command_list
+    (command
+      body: (file_name_command))
+    (separator)
+    (command
+      body: (clear_command))
+    (separator)))
+
+==================
+Parses GNU silent quit with compact and spaced statuses
+==================
+Q
+Q42
+Q 7
+1Q 7
+
+---
+
+(script
+  (command_list
+    (command
+      body: (silent_quit_command))
+    (separator)
+    (command
+      body: (silent_quit_command
+        status: (exit_status)))
+    (separator)
+    (command
+      body: (silent_quit_command
+        status: (exit_status)))
+    (separator)
+    (command
+      addresses: (address
+        (line_number_address))
+      body: (silent_quit_command
+        status: (exit_status)))
+    (separator)))
+
+==================
+Parses GNU read-line and write-first-line commands
+==================
+R input data
+W output data
+
+---
+
+(script
+  (command_list
+    (command
+      body: (read_line_command
+        file: (file_argument)))
+    (separator)
+    (command
+      body: (write_first_line_command
+        file: (file_argument)))
+    (separator)))
+
+==================
+Parses GNU failure branches with and without labels
+==================
+T
+T done
+
+---
+
+(script
+  (command_list
+    (command
+      body: (test_failure_command))
+    (separator)
+    (command
+      body: (test_failure_command
+        label: (label)))
+    (separator)))
+
+==================
+Parses GNU version checks with and without a version
+==================
+v
+v 4.0.5
+
+---
+
+(script
+  (command_list
+    (command
+      body: (version_command))
+    (separator)
+    (command
+      body: (version_command
+        version: (version_argument)))
+    (separator)))
+
+==================
+Parses GNU execute commands with and without shell text
+==================
+e
+e printf 'ok'; # shell text
+
+---
+
+(script
+  (command_list
+    (command
+      body: (execute_command))
+    (separator)
+    (command
+      body: (execute_command
+        command: (shell_command)))
+    (separator)))
+
+==================
+Parses GNU quit statuses with compact and spaced forms
+==================
+q23
+q 24
+
+---
+
+(script
+  (command_list
+    (command
+      body: (quit_command
+        status: (exit_status)))
+    (separator)
+    (command
+      body: (quit_command
+        status: (exit_status)))
+    (separator)))
+
+==================
+Parses GNU list widths with compact and spaced forms
+==================
+l80
+l 81
+
+---
+
+(script
+  (command_list
+    (command
+      body: (list_command
+        width: (line_wrap_length)))
+    (separator)
+    (command
+      body: (list_command
+        width: (line_wrap_length)))
+    (separator)))
+
+==================
+Allows two addresses on GNU chainable commands
+==================
+1,2=
+1,2l 80
+1,2F
+1,2T done
+1,2v 4.0
+1,2z
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address_range
+        start: (address
+          (line_number_address))
+        end: (address
+          (line_number_address)))
+      body: (line_number_command))
+    (separator)
+    (command
+      addresses: (address_range
+        start: (address
+          (line_number_address))
+        end: (address
+          (line_number_address)))
+      body: (list_command
+        width: (line_wrap_length)))
+    (separator)
+    (command
+      addresses: (address_range
+        start: (address
+          (line_number_address))
+        end: (address
+          (line_number_address)))
+      body: (file_name_command))
+    (separator)
+    (command
+      addresses: (address_range
+        start: (address
+          (line_number_address))
+        end: (address
+          (line_number_address)))
+      body: (test_failure_command
+        label: (label)))
+    (separator)
+    (command
+      addresses: (address_range
+        start: (address
+          (line_number_address))
+        end: (address
+          (line_number_address)))
+      body: (version_command
+        version: (version_argument)))
+    (separator)
+    (command
+      addresses: (address_range
+        start: (address
+          (line_number_address))
+        end: (address
+          (line_number_address)))
+      body: (clear_command))
+    (separator)))
+
+==================
+Allows two addresses on GNU line-consuming commands
+==================
+1,2a append range
+1,2i insert range
+1,2r read range
+1,2e echo range
+1,2R read-lines
+1,2W write-first
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address_range
+        start: (address
+          (line_number_address))
+        end: (address
+          (line_number_address)))
+      body: (append_command
+        text: (text_block)))
+    (separator)
+    (command
+      addresses: (address_range
+        start: (address
+          (line_number_address))
+        end: (address
+          (line_number_address)))
+      body: (insert_command
+        text: (text_block)))
+    (separator)
+    (command
+      addresses: (address_range
+        start: (address
+          (line_number_address))
+        end: (address
+          (line_number_address)))
+      body: (read_command
+        file: (file_argument)))
+    (separator)
+    (command
+      addresses: (address_range
+        start: (address
+          (line_number_address))
+        end: (address
+          (line_number_address)))
+      body: (execute_command
+        command: (shell_command)))
+    (separator)
+    (command
+      addresses: (address_range
+        start: (address
+          (line_number_address))
+        end: (address
+          (line_number_address)))
+      body: (read_line_command
+        file: (file_argument)))
+    (separator)
+    (command
+      addresses: (address_range
+        start: (address
+          (line_number_address))
+        end: (address
+          (line_number_address)))
+      body: (write_first_line_command
+        file: (file_argument)))
+    (separator)))
+
+==================
+Allows GNU address ranges on line-number and read commands
+==================
+1,2=
+1,2r file
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address_range
+        start: (address
+          (line_number_address))
+        end: (address
+          (line_number_address)))
+      body: (line_number_command))
+    (separator)
+    (command
+      addresses: (address_range
+        start: (address
+          (line_number_address))
+        end: (address
+          (line_number_address)))
+      body: (read_command
+        file: (file_argument)))
+    (separator)))

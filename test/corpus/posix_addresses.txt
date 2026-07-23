@@ -1,0 +1,167 @@
+==================
+Parses numeric, last-line, regex, range, and negated addresses
+==================
+1d
+$p
+/foo/p
+1,3d
+/foo/,$p
+/foo/!d
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address
+        (line_number_address))
+      body: (delete_command))
+    (separator)
+    (command
+      addresses: (address
+        (last_line_address))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address_range
+        start: (address
+          (line_number_address))
+        end: (address
+          (line_number_address)))
+      body: (delete_command))
+    (separator)
+    (command
+      addresses: (address_range
+        start: (address
+          (regex_address
+            pattern: (regex
+              body: (regex_content))))
+        end: (address
+          (last_line_address)))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex
+            body: (regex_content))))
+      negation: (negation)
+      body: (delete_command))
+    (separator)))
+
+==================
+Applies POSIX one-address and two-address command limits
+==================
+1q
+$=
+/x/r data.txt
+1a\
+append once
+1i\
+insert once
+1,2c\
+change range
+1,2l
+1,2d
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address
+        (line_number_address))
+      body: (quit_command))
+    (separator)
+    (command
+      addresses: (address
+        (last_line_address))
+      body: (line_number_command))
+    (separator)
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (read_command
+        file: (file_argument)))
+    (separator)
+    (command
+      addresses: (address
+        (line_number_address))
+      body: (append_command
+        text: (text_block)))
+    (separator)
+    (command
+      addresses: (address
+        (line_number_address))
+      body: (insert_command
+        text: (text_block)))
+    (separator)
+    (command
+      addresses: (address_range
+        start: (address
+          (line_number_address))
+        end: (address
+          (line_number_address)))
+      body: (change_command
+        text: (text_block)))
+    (separator)
+    (command
+      addresses: (address_range
+        start: (address
+          (line_number_address))
+        end: (address
+          (line_number_address)))
+      body: (list_command))
+    (separator)
+    (command
+      addresses: (address_range
+        start: (address
+          (line_number_address))
+        end: (address
+          (line_number_address)))
+      body: (delete_command))
+    (separator)))
+
+==================
+Allows POSIX blanks after an address and before a label
+==================
+1,2p
+1 !p
+b label
+t label
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address_range
+        start: (address
+          (line_number_address))
+        end: (address
+          (line_number_address)))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (line_number_address))
+      negation: (negation)
+      body: (print_command))
+    (separator)
+    (command
+      body: (branch_command
+        label: (label)))
+    (separator)
+    (command
+      body: (test_command
+        label: (label)))
+    (separator)))

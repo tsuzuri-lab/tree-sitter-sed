@@ -1,0 +1,119 @@
+==================
+Parses the uppercase GNU case-insensitive flag
+==================
+s/a/b/I
+
+---
+
+(script
+  (command_list
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)
+        flags: (substitute_flags
+          (ignore_case_flag))))
+    (separator)))
+
+==================
+Parses spaced GNU substitute flags in source order
+==================
+s/a/b/I M m e p 2 g
+s/a/b/ I M e p 2 g ; p
+
+---
+
+(script
+  (command_list
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)
+        flags: (substitute_flags
+          (ignore_case_flag)
+          (multiline_flag)
+          (multiline_flag)
+          (execute_flag)
+          (print_flag)
+          (occurrence_flag)
+          (global_flag))))
+    (separator)
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)
+        flags: (substitute_flags
+          (ignore_case_flag)
+          (multiline_flag)
+          (execute_flag)
+          (print_flag)
+          (occurrence_flag)
+          (global_flag))))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Starts another command after the GNU execute flag
+==================
+s/a/b/e;p
+
+---
+
+(script
+  (command_list
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)
+        flags: (substitute_flags
+          (execute_flag))))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Treats the rest of a GNU write flag line as the filename
+==================
+s/a/b/g w output file;#literal
+
+---
+
+(script
+  (command_list
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)
+        flags: (substitute_flags
+          (global_flag)
+          (write_flag
+            file: (file_argument)))))
+    (separator)))
+
+==================
+Keeps GNU case-conversion escapes inside replacement text
+==================
+s/x/\L&\E/
+p
+
+---
+
+(script
+  (command_list
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))

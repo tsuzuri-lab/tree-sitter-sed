@@ -1,0 +1,241 @@
+==================
+Parses GNU periodic addresses with optional blanks
+==================
+0~3p
+50~0p
+1~2p
+1 ~ 2 p
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address
+        (periodic_address
+          start: (line_number_address)
+          step: (step_value)))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (periodic_address
+          start: (line_number_address)
+          step: (step_value)))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (periodic_address
+          start: (line_number_address)
+          step: (step_value)))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (periodic_address
+          start: (line_number_address)
+          step: (step_value)))
+      body: (print_command))
+    (separator)))
+
+==================
+Parses GNU relative range endings with optional blanks
+==================
+1,+4p
+1 , + 4 p
+/re/,+2p
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address_range
+        start: (address
+          (line_number_address))
+        end: (relative_address
+          offset: (line_offset)))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address_range
+        start: (address
+          (line_number_address))
+        end: (relative_address
+          offset: (line_offset)))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address_range
+        start: (address
+          (regex_address
+            pattern: (regex
+              body: (regex_content))))
+        end: (relative_address
+          offset: (line_offset)))
+      body: (print_command))
+    (separator)))
+
+==================
+Parses GNU next-multiple range endings
+==================
+1,~5p
+/re/,~4p
+1 ~ 2 , ~ 5 ! p
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address_range
+        start: (address
+          (line_number_address))
+        end: (next_multiple_address
+          multiple: (step_value)))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address_range
+        start: (address
+          (regex_address
+            pattern: (regex
+              body: (regex_content))))
+        end: (next_multiple_address
+          multiple: (step_value)))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address_range
+        start: (address
+          (periodic_address
+            start: (line_number_address)
+            step: (step_value)))
+        end: (next_multiple_address
+          multiple: (step_value)))
+      negation: (negation)
+      body: (print_command))
+    (separator)))
+
+==================
+Parses a GNU zero-to-regex address range
+==================
+0,/start/p
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address_range
+        start: (address
+          (line_number_address))
+        end: (address
+          (regex_address
+            pattern: (regex
+              body: (regex_content)))))
+      body: (print_command))
+    (separator)))
+
+==================
+Parses GNU regex-address flags with optional blanks
+==================
+/x/IMp
+/x/ I M p
+\#route# M I p
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex
+            body: (regex_content))
+          flags: (regex_flags
+            (ignore_case_flag)
+            (multiline_flag))))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex
+            body: (regex_content))
+          flags: (regex_flags
+            (ignore_case_flag)
+            (multiline_flag))))
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (escaped_regex_address
+          pattern: (regex
+            body: (regex_content))
+          flags: (regex_flags
+            (multiline_flag)
+            (ignore_case_flag))))
+      body: (print_command))
+    (separator)))
+
+==================
+Allows a GNU zero address on a read command
+==================
+0r prelude.txt
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address
+        (line_number_address))
+      body: (read_command
+        file: (file_argument)))
+    (separator)))
+
+==================
+Allows a blank before a GNU address-range comma
+==================
+1 ,2p
+p
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address_range
+        start: (address
+          (line_number_address))
+        end: (address
+          (line_number_address)))
+      body: (print_command))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Allows a blank after a GNU address-range comma
+==================
+1, 2p
+p
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address_range
+        start: (address
+          (line_number_address))
+        end: (address
+          (line_number_address)))
+      body: (print_command))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))

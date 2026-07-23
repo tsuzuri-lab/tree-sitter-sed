@@ -1,0 +1,240 @@
+==================
+Allows trailing blanks after GNU commands without arguments
+==================
+p   
+q   
+Q   
+l   
+b   
+t   
+T   
+v   
+e   
+
+---
+
+(script
+  (command_list
+    (command
+      body: (print_command))
+    (separator)
+    (command
+      body: (quit_command))
+    (separator)
+    (command
+      body: (silent_quit_command))
+    (separator)
+    (command
+      body: (list_command))
+    (separator)
+    (command
+      body: (branch_command))
+    (separator)
+    (command
+      body: (test_command))
+    (separator)
+    (command
+      body: (test_failure_command))
+    (separator)
+    (command
+      body: (version_command))
+    (separator)
+    (command
+      body: (execute_command))
+    (separator)))
+
+==================
+Allows trailing blanks after GNU substitute operands and flags
+==================
+s/a/b/   
+s/a/b/g   
+
+---
+
+(script
+  (command_list
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)))
+    (separator)
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)
+        flags: (substitute_flags
+          (global_flag))))
+    (separator)))
+
+==================
+Starts a comment after blanks following a GNU substitute command
+==================
+s/a/b/   # comment
+
+---
+
+(script
+  (command_list
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)))
+    (comment_command)
+    (separator)))
+
+==================
+Allows blanks around GNU address and negation syntax
+==================
+1 , 2 ! p
+! # comment
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address_range
+        start: (address
+          (line_number_address))
+        end: (address
+          (line_number_address)))
+      negation: (negation)
+      body: (print_command))
+    (separator)
+    negation: (negation)
+    (comment_command)
+    (separator)))
+
+==================
+Allows trailing blanks before GNU block terminators
+==================
+{p   }
+{p   ;}
+
+---
+
+(script
+  (command_list
+    (command
+      body: (block_command
+        (command_list
+          (command
+            body: (print_command)))))
+    (separator)
+    (command
+      body: (block_command
+        (command_list
+          (command
+            body: (print_command))
+          (separator))))
+    (separator)))
+
+==================
+Allows a blank after GNU command negation
+==================
+! p
+p
+
+---
+
+(script
+  (command_list
+    (command
+      negation: (negation)
+      body: (print_command))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Allows a blank between GNU negation and a comment
+==================
+! # comment
+p
+
+---
+
+(script
+  (command_list
+    negation: (negation)
+    (comment_command)
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Allows multiple spaces before a GNU branch label
+==================
+b  label
+p
+
+---
+
+(script
+  (command_list
+    (command
+      body: (branch_command
+        label: (label)))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Allows a tab before a GNU branch label
+==================
+b	label
+p
+
+---
+
+(script
+  (command_list
+    (command
+      body: (branch_command
+        label: (label)))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Allows multiple spaces before a GNU test label
+==================
+t  label
+p
+
+---
+
+(script
+  (command_list
+    (command
+      body: (test_command
+        label: (label)))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Allows a tab before a GNU test label
+==================
+t	label
+p
+
+---
+
+(script
+  (command_list
+    (command
+      body: (test_command
+        label: (label)))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))

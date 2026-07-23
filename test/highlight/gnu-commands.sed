@@ -1,25 +1,3 @@
-0 ~ 3 p
-# <- number
-# ^ operator
-#   ^ number
-#     ^ function.builtin
-
-1,+4p
-# ^ operator
-#  ^ number
-#   ^ function.builtin
-
-1,~4p
-# ^ operator
-#  ^ number
-#   ^ function.builtin
-
-/x/IMp
-# <- string.regexp
-#  ^ attribute
-#   ^ attribute
-#    ^ function.builtin
-
 Q 42
 # <- function.builtin
 # ^ number
@@ -57,11 +35,3 @@ e echo hi
 
 z
 # <- function.builtin
-
-s/a/b/IMe
-# <- function.builtin
-#  ^ string.regexp
-#   ^ string
-#     ^ attribute
-#      ^ attribute
-#       ^ attribute

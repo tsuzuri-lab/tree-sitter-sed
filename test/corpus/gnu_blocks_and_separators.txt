@@ -1,0 +1,248 @@
+==================
+Chains GNU labels and branch commands with semicolons
+==================
+:loop ; b loop ; t loop ; T loop ; p
+
+---
+
+(script
+  (command_list
+    (command
+      body: (label_command
+        label: (label)))
+    (separator)
+    (command
+      body: (branch_command
+        label: (label)))
+    (separator)
+    (command
+      body: (test_command
+        label: (label)))
+    (separator)
+    (command
+      body: (test_failure_command
+        label: (label)))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Chains unlabeled GNU branch commands with semicolons
+==================
+b ; t ; T ; p
+
+---
+
+(script
+  (command_list
+    (command
+      body: (branch_command))
+    (separator)
+    (command
+      body: (test_command))
+    (separator)
+    (command
+      body: (test_failure_command))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Chains GNU labels and branches inside a compact block
+==================
+{ :inner ; b inner ; t inner ; T inner ; p; };d
+
+---
+
+(script
+  (command_list
+    (command
+      body: (block_command
+        (command_list
+          (command
+            body: (label_command
+              label: (label)))
+          (separator)
+          (command
+            body: (branch_command
+              label: (label)))
+          (separator)
+          (command
+            body: (test_command
+              label: (label)))
+          (separator)
+          (command
+            body: (test_failure_command
+              label: (label)))
+          (separator)
+          (command
+            body: (print_command))
+          (separator))))
+    (separator)
+    (command
+      body: (delete_command))
+    (separator)))
+
+==================
+Parses compact, empty, and nested GNU blocks
+==================
+{p}
+{}
+{{p};d}
+
+---
+
+(script
+  (command_list
+    (command
+      body: (block_command
+        (command_list
+          (command
+            body: (print_command)))))
+    (separator)
+    (command
+      body: (block_command))
+    (separator)
+    (command
+      body: (block_command
+        (command_list
+          (command
+            body: (block_command
+              (command_list
+                (command
+                  body: (print_command)))))
+          (separator)
+          (command
+            body: (delete_command)))))
+    (separator)))
+
+==================
+Starts another command after a compact GNU block and semicolon
+==================
+{p;};d
+
+---
+
+(script
+  (command_list
+    (command
+      body: (block_command
+        (command_list
+          (command
+            body: (print_command))
+          (separator))))
+    (separator)
+    (command
+      body: (delete_command))
+    (separator)))
+
+==================
+Starts a command on the line after a compact GNU block
+==================
+{p}
+p
+
+---
+
+(script
+  (command_list
+    (command
+      body: (block_command
+        (command_list
+          (command
+            body: (print_command)))))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Parses an empty GNU block before another command
+==================
+{}
+p
+
+---
+
+(script
+  (command_list
+    (command
+      body: (block_command))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Allows compact semicolons after GNU labels and branch commands
+==================
+b;p
+t;p
+:label;p
+b label;p
+t label;p
+{b;}
+{t;}
+{:label;}
+
+---
+
+(script
+  (command_list
+    (command
+      body: (branch_command))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)
+    (command
+      body: (test_command))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)
+    (command
+      body: (label_command
+        label: (label)))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)
+    (command
+      body: (branch_command
+        label: (label)))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)
+    (command
+      body: (test_command
+        label: (label)))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)
+    (command
+      body: (block_command
+        (command_list
+          (command
+            body: (branch_command))
+          (separator))))
+    (separator)
+    (command
+      body: (block_command
+        (command_list
+          (command
+            body: (test_command))
+          (separator))))
+    (separator)
+    (command
+      body: (block_command
+        (command_list
+          (command
+            body: (label_command
+              label: (label)))
+          (separator))))
+    (separator)))

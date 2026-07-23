@@ -31,7 +31,9 @@ npm run setup:cli
 npm run check
 ```
 
-No global Tree-sitter installation is required.
+`npm test` runs the corpus, highlighting, and Node regression tests.
+`npm run check` also verifies that generated files are current. No global
+Tree-sitter installation is required.
 
 ## References
 

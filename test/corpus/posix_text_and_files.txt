@@ -1,0 +1,173 @@
+==================
+Parses insert, append, and change text blocks
+==================
+i\
+inserted before
+a\
+inserted after
+c\
+changed line
+
+---
+
+(script
+  (command_list
+    (command
+      body: (insert_command
+        text: (text_block)))
+    (separator)
+    (command
+      body: (append_command
+        text: (text_block)))
+    (separator)
+    (command
+      body: (change_command
+        text: (text_block)))
+    (separator)))
+
+==================
+Parses read and write filenames including embedded blanks
+==================
+r input.txt
+w output.txt
+/^x/r data file.txt
+
+---
+
+(script
+  (command_list
+    (command
+      body: (read_command
+        file: (file_argument)))
+    (separator)
+    (command
+      body: (write_command
+        file: (file_argument)))
+    (separator)
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (read_command
+        file: (file_argument)))
+    (separator)))
+
+==================
+Continues a POSIX text block after an escaped newline
+==================
+a\
+line one\
+line two
+
+---
+
+(script
+  (command_list
+    (command
+      body: (append_command
+        text: (text_block)))
+    (separator)))
+
+==================
+Treats semicolons after POSIX filenames as filename text
+==================
+r input.txt;p
+w output.txt;p
+s/a/b/w output.txt;p
+
+---
+
+(script
+  (command_list
+    (command
+      body: (read_command
+        file: (file_argument)))
+    (separator)
+    (command
+      body: (write_command
+        file: (file_argument)))
+    (separator)
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)
+        flags: (substitute_flags
+          (write_flag
+            file: (file_argument)))))
+    (separator)))
+
+==================
+Ends an empty POSIX text block before the following command
+==================
+a\
+
+p
+i\
+
+d
+1,2c\
+
+p
+
+---
+
+(script
+  (command_list
+    (command
+      body: (append_command
+        text: (text_block)))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)
+    (command
+      body: (insert_command
+        text: (text_block)))
+    (separator)
+    (command
+      body: (delete_command))
+    (separator)
+    (command
+      addresses: (address_range
+        start: (address
+          (line_number_address))
+        end: (address
+          (line_number_address)))
+      body: (change_command
+        text: (text_block)))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Continues POSIX text only after an odd trailing backslash run
+==================
+a\
+two\\
+p
+a\
+three\\\
+continued
+d
+
+---
+
+(script
+  (command_list
+    (command
+      body: (append_command
+        text: (text_block)))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)
+    (command
+      body: (append_command
+        text: (text_block)))
+    (separator)
+    (command
+      body: (delete_command))
+    (separator)))

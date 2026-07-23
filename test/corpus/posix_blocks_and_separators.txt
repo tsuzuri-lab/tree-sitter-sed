@@ -1,0 +1,282 @@
+==================
+Separates commands with semicolons and newlines
+==================
+d;p
+1d
+2p
+
+---
+
+(script
+  (command_list
+    (command
+      body: (delete_command))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)
+    (command
+      addresses: (address
+        (line_number_address))
+      body: (delete_command))
+    (separator)
+    (command
+      addresses: (address
+        (line_number_address))
+      body: (print_command))
+    (separator)))
+
+==================
+Parses a multiline block with addressed commands
+==================
+{
+  1d
+  /x/p
+}
+
+---
+
+(script
+  (command_list
+    (command
+      body: (block_command
+        (command_list
+          (separator)
+          (command
+            addresses: (address
+              (line_number_address))
+            body: (delete_command))
+          (separator)
+          (command
+            addresses: (address
+              (regex_address
+                pattern: (regex
+                  body: (regex_content))))
+            body: (print_command))
+          (separator))))
+    (separator)))
+
+==================
+Closes POSIX blocks after a semicolon or newline
+==================
+{p;}
+{
+  p
+}
+
+---
+
+(script
+  (command_list
+    (command
+      body: (block_command
+        (command_list
+          (command
+            body: (print_command))
+          (separator))))
+    (separator)
+    (command
+      body: (block_command
+        (command_list
+          (separator)
+          (command
+            body: (print_command))
+          (separator))))
+    (separator)))
+
+==================
+Stops POSIX branch and label arguments at line boundaries
+==================
+d;b end
+s/a/b/g;p
+y/a/b/;p
+b end
+t end
+:done
+
+---
+
+(script
+  (command_list
+    (command
+      body: (delete_command))
+    (separator)
+    (command
+      body: (branch_command
+        label: (label)))
+    (separator)
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)
+        flags: (substitute_flags
+          (global_flag))))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)
+    (command
+      body: (translate_command
+        source: (translate_source)
+        destination: (translate_destination)))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)
+    (command
+      body: (branch_command
+        label: (label)))
+    (separator)
+    (command
+      body: (test_command
+        label: (label)))
+    (separator)
+    (command
+      body: (label_command
+        label: (label)))
+    (separator)))
+
+==================
+Keeps POSIX line-terminated commands inside their block line
+==================
+{p;}
+{;p;}
+{
+  d;b done
+}
+
+---
+
+(script
+  (command_list
+    (command
+      body: (block_command
+        (command_list
+          (command
+            body: (print_command))
+          (separator))))
+    (separator)
+    (command
+      body: (block_command
+        (command_list
+          (separator)
+          (command
+            body: (print_command))
+          (separator))))
+    (separator)
+    (command
+      body: (block_command
+        (command_list
+          (separator)
+          (command
+            body: (delete_command))
+          (separator)
+          (command
+            body: (branch_command
+              label: (label)))
+          (separator))))
+    (separator)))
+
+==================
+Allows POSIX block braces after permitted whitespace
+==================
+{
+  p
+  }
+{p;   }
+{
+    }
+{ ; }
+
+---
+
+(script
+  (command_list
+    (command
+      body: (block_command
+        (command_list
+          (separator)
+          (command
+            body: (print_command))
+          (separator))))
+    (separator)
+    (command
+      body: (block_command
+        (command_list
+          (command
+            body: (print_command))
+          (separator))))
+    (separator)
+    (command
+      body: (block_command
+        (command_list
+          (separator))))
+    (separator)
+    (command
+      body: (block_command
+        (command_list
+          (separator))))
+    (separator)))
+
+==================
+Parses a negated comment without consuming the next line
+==================
+!# comment
+p
+
+---
+
+(script
+  (command_list
+    negation: (negation)
+    (comment_command)
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Allows trailing blanks before a block newline
+==================
+{
+  p 
+}
+p
+
+---
+
+(script
+  (command_list
+    (command
+      body: (block_command
+        (command_list
+          (separator)
+          (command
+            body: (print_command))
+          (separator))))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Allows trailing blanks before a block semicolon
+==================
+{p ;}
+p
+
+---
+
+(script
+  (command_list
+    (command
+      body: (block_command
+        (command_list
+          (command
+            body: (print_command))
+          (separator))))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))

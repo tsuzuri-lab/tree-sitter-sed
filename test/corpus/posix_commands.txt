@@ -1,0 +1,149 @@
+==================
+Parses delete, print, quit, and next commands
+==================
+d
+p
+q
+n
+
+---
+
+(script
+  (command_list
+    (command
+      body: (delete_command))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)
+    (command
+      body: (quit_command))
+    (separator)
+    (command
+      body: (next_command))
+    (separator)))
+
+==================
+Parses hold-space, multiline, line-number, and list commands
+==================
+h
+H
+g
+G
+x
+N
+P
+D
+=
+l
+
+---
+
+(script
+  (command_list
+    (command
+      body: (hold_command))
+    (separator)
+    (command
+      body: (hold_append_command))
+    (separator)
+    (command
+      body: (get_command))
+    (separator)
+    (command
+      body: (get_append_command))
+    (separator)
+    (command
+      body: (exchange_command))
+    (separator)
+    (command
+      body: (next_append_command))
+    (separator)
+    (command
+      body: (print_first_line_command))
+    (separator)
+    (command
+      body: (delete_first_line_command))
+    (separator)
+    (command
+      body: (line_number_command))
+    (separator)
+    (command
+      body: (list_command))
+    (separator)))
+
+==================
+Parses a comment followed by a command
+==================
+# comment
+d
+
+---
+
+(script
+  (command_list
+    (comment_command)
+    (separator)
+    (command
+      body: (delete_command))
+    (separator)))
+
+==================
+Recognizes the silent directive at the start of a script
+==================
+#n
+p
+
+---
+
+(script
+  (first_line_silent)
+  (command_list
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Treats a later hash-n line as an ordinary comment
+==================
+p
+#n is a comment after the first line
+
+---
+
+(script
+  (command_list
+    (command
+      body: (print_command))
+    (separator)
+    (comment_command)
+    (separator)))
+
+==================
+Parses labels and successful-substitution branches
+==================
+:ok
+b
+b ok
+t ok
+
+---
+
+(script
+  (command_list
+    (command
+      body: (label_command
+        label: (label)))
+    (separator)
+    (command
+      body: (branch_command))
+    (separator)
+    (command
+      body: (branch_command
+        label: (label)))
+    (separator)
+    (command
+      body: (test_command
+        label: (label)))
+    (separator)))

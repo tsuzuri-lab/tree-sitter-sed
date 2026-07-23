@@ -1,0 +1,310 @@
+==================
+Parses substitute operands with slash and alternate delimiters
+==================
+s/a/b/
+s/a/b/g
+s#/#_#g
+s#^/api/#route:#g
+s/a\/b/c/
+s/a//p
+s#x#y#
+
+---
+
+(script
+  (command_list
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)))
+    (separator)
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)
+        flags: (substitute_flags
+          (global_flag))))
+    (separator)
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)
+        flags: (substitute_flags
+          (global_flag))))
+    (separator)
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)
+        flags: (substitute_flags
+          (global_flag))))
+    (separator)
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)))
+    (separator)
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        flags: (substitute_flags
+          (print_flag))))
+    (separator)
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)))
+    (separator)))
+
+==================
+Applies a regex address to a substitute command
+==================
+/^flagp:/s/^flagp:/flagp=/p
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address
+        (regex_address
+          pattern: (regex
+            body: (regex_content))))
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)
+        flags: (substitute_flags
+          (print_flag))))
+    (separator)))
+
+==================
+Starts another command after a completed substitute command
+==================
+s/a/b/;p
+s#a#b#p;d
+
+---
+
+(script
+  (command_list
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)
+        flags: (substitute_flags
+          (print_flag))))
+    (separator)
+    (command
+      body: (delete_command))
+    (separator)))
+
+==================
+Starts a trailing comment after a completed substitute command
+==================
+s#x#y#;# comment
+
+---
+
+(script
+  (command_list
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)))
+    (separator)
+    (comment_command)
+    (separator)))
+
+==================
+Retains nodes for empty substitute patterns and replacements
+==================
+s//x/
+s/a//
+
+---
+
+(script
+  (command_list
+    (command
+      body: (substitute_command
+        pattern: (regex)
+        replacement: (replacement)))
+    (separator)
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))))
+    (separator)))
+
+==================
+Keeps blanks and bracket expressions inside substitute patterns
+==================
+s/ /_/g
+s/[ ][ ]*/_/g
+
+---
+
+(script
+  (command_list
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)
+        flags: (substitute_flags
+          (global_flag))))
+    (separator)
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)
+        flags: (substitute_flags
+          (global_flag))))
+    (separator)))
+
+==================
+Keeps backreferences and ampersands inside replacement text
+==================
+s/^x$/replacement keeps [[:digit:]] \1 \& literal/
+
+---
+
+(script
+  (command_list
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)))
+    (separator)))
+
+==================
+Parses global, occurrence, print, and write substitute flags
+==================
+s/a/b/g
+s/a/b/2p
+s/a/b/w out.txt
+s/a/b/w out.txt;p
+
+---
+
+(script
+  (command_list
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)
+        flags: (substitute_flags
+          (global_flag))))
+    (separator)
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)
+        flags: (substitute_flags
+          (occurrence_flag)
+          (print_flag))))
+    (separator)
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)
+        flags: (substitute_flags
+          (write_flag
+            file: (file_argument)))))
+    (separator)
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)
+        flags: (substitute_flags
+          (write_flag
+            file: (file_argument)))))
+    (separator)))
+
+==================
+Allows an escaped newline inside a POSIX replacement
+==================
+s/a/one\
+two/
+
+---
+
+(script
+  (command_list
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)))
+    (separator)))
+
+==================
+Parses the lowercase POSIX case-insensitive flag
+==================
+s/a/b/i
+p
+
+---
+
+(script
+  (command_list
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)
+        flags: (substitute_flags
+          (ignore_case_flag))))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
+
+==================
+Combines occurrence, case-insensitive, and print flags
+==================
+s/a/b/2ip
+p
+
+---
+
+(script
+  (command_list
+    (command
+      body: (substitute_command
+        pattern: (regex
+          body: (regex_content))
+        replacement: (replacement)
+        flags: (substitute_flags
+          (occurrence_flag)
+          (ignore_case_flag)
+          (print_flag))))
+    (separator)
+    (command
+      body: (print_command))
+    (separator)))
