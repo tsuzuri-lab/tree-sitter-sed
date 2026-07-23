@@ -3,8 +3,6 @@
 
 # Node artifacts
 node_modules/
-build/
-prebuilds/
 
 # Logs
 npm-debug.log*
@@ -12,46 +10,16 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Rust artifacts
-target/
-
-# Swift artifacts
-.build/
-
-# Go artifacts
-_obj/
-
-# Python artifacts
-.venv/
-dist/
-*.egg-info/
-*.whl
-
-# Test artifacts
-coverage/
-.nyc_output/
-
 # C artifacts
 *.a
 *.so
 *.so.*
 *.dylib
 *.dll
-*.pc
 *.exp
 *.lib
 *.exe
 
-# Zig artifacts
-.zig-cache/
-zig-cache/
-zig-out/
-
 # Grammar volatiles
 *.obj
 *.o
-
-# Archives
-*.tar.gz
-*.tgz
-*.zip
