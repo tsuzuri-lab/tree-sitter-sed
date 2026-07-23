@@ -50,7 +50,6 @@ zig-out/
 # Grammar volatiles
 *.obj
 *.o
-*.wasm
 
 # Archives
 *.tar.gz

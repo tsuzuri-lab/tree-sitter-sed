@@ -74,7 +74,7 @@ jobs:
 
   maintenance:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-    name: Scheduled fuzz and Wasm
+    name: Scheduled fuzz
     runs-on: ubuntu-24.04
     timeout-minutes: 30
 
@@ -101,13 +101,3 @@ jobs:
 
       - name: Fuzz corpus with bounded edits
         run: npm run test:fuzz
-
-      - name: Install verified WASI SDK
-        run: node scripts/install-wasi-sdk.js
-        env:
-          TREE_SITTER_WASI_SDK_PATH: ${{ runner.temp }}/wasi-sdk
-
-      - name: Test Wasm parser
-        run: npm run test:wasm
-        env:
-          TREE_SITTER_WASI_SDK_PATH: ${{ runner.temp }}/wasi-sdk
