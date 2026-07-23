@@ -252,7 +252,8 @@ name#p
 s/foo\
 bar/baz/
 y/a\
-b/cd/
+b/c\
+d/
 y/ab/c\
 d/
 

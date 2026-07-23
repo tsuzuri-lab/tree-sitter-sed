@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 const { spawnSync } = require("node:child_process");
+const { randomUUID } = require("node:crypto");
 const {
   chmodSync,
+  existsSync,
   mkdtempSync,
   readFileSync,
   renameSync,
@@ -60,6 +62,84 @@ const assets = {
   ],
 };
 
+function verifyTreeSitterExecutable(path) {
+  const result = spawnSync(path, ["--version"], {
+    encoding: "utf8",
+    windowsHide: true,
+  });
+  const output = `${result.stdout ?? ""}${result.stderr ?? ""}`.trim();
+  const expected = `tree-sitter ${version}`;
+
+  if (result.error) {
+    throw new Error(
+      `Tree-sitter CLI version verification failed: ${result.error.message}`,
+      { cause: result.error },
+    );
+  }
+  if (
+    result.status !== 0 ||
+    (output !== expected && !output.startsWith(`${expected} `))
+  ) {
+    throw new Error(`Tree-sitter CLI version verification failed: ${output}`);
+  }
+
+  return output;
+}
+
+function replaceVerifiedExecutable({
+  backupPath,
+  executablePath,
+  stagedExecutable,
+  verifyExecutable,
+}) {
+  verifyExecutable(stagedExecutable);
+
+  const hadPreviousExecutable = existsSync(executablePath);
+  if (hadPreviousExecutable) {
+    renameSync(executablePath, backupPath);
+  }
+
+  let output;
+  try {
+    renameSync(stagedExecutable, executablePath);
+    output = verifyExecutable(executablePath);
+  } catch (installError) {
+    const recoveryErrors = [];
+    try {
+      rmSync(executablePath, { force: true });
+    } catch (error) {
+      recoveryErrors.push(error);
+    }
+
+    if (hadPreviousExecutable) {
+      try {
+        renameSync(backupPath, executablePath);
+      } catch (error) {
+        recoveryErrors.push(error);
+      }
+    }
+
+    if (recoveryErrors.length > 0) {
+      const recoveryFailure = hadPreviousExecutable
+        ? "restore the previous executable"
+        : "remove the failed executable";
+      const backupLocation = existsSync(backupPath)
+        ? `; the backup remains at ${backupPath}`
+        : "";
+      throw new AggregateError(
+        [installError, ...recoveryErrors],
+        `Failed to install the verified Tree-sitter CLI and ${recoveryFailure}${backupLocation}`,
+      );
+    }
+    throw installError;
+  }
+
+  if (hadPreviousExecutable) {
+    rmSync(backupPath, { force: true });
+  }
+  return output;
+}
+
 async function main() {
   const asset = assets[`${process.platform}-${process.arch}`];
   if (asset === undefined) {
@@ -82,9 +162,14 @@ async function main() {
   const executablePath = join(packageDirectory, executableName);
   const temporaryDirectory = mkdtempSync(join(tmpdir(), "tree-sitter-cli-"));
   const archivePath = join(temporaryDirectory, basename(asset[0]));
+  const installationId = `${process.pid}-${randomUUID()}`;
   const stagedExecutable = join(
     packageDirectory,
-    `${executableName}.verified-${process.pid}`,
+    `${executableName}.verified-${installationId}`,
+  );
+  const backupPath = join(
+    packageDirectory,
+    `${executableName}.previous-${installationId}`,
   );
 
   try {
@@ -102,21 +187,12 @@ async function main() {
     });
     writeFileSync(stagedExecutable, executable, { mode: 0o755 });
     chmodSync(stagedExecutable, 0o755);
-    rmSync(executablePath, { force: true });
-    renameSync(stagedExecutable, executablePath);
-
-    const result = spawnSync(executablePath, ["--version"], {
-      encoding: "utf8",
-      windowsHide: true,
+    const output = replaceVerifiedExecutable({
+      backupPath,
+      executablePath,
+      stagedExecutable,
+      verifyExecutable: verifyTreeSitterExecutable,
     });
-    const output = `${result.stdout ?? ""}${result.stderr ?? ""}`.trim();
-    if (
-      result.status !== 0 ||
-      !new RegExp(`^tree-sitter ${version}(?:\\s|$)`).test(output)
-    ) {
-      rmSync(executablePath, { force: true });
-      throw new Error(`Installed CLI failed version verification: ${output}`);
-    }
 
     console.log(`Installed ${output}; verified SHA-256 ${asset[1]}`);
   } finally {
@@ -125,7 +201,11 @@ async function main() {
   }
 }
 
-main().catch((error) => {
-  console.error(error instanceof Error ? error.message : error);
-  process.exitCode = 1;
-});
+if (require.main === module) {
+  main().catch((error) => {
+    console.error(error instanceof Error ? error.message : error);
+    process.exitCode = 1;
+  });
+}
+
+module.exports = { replaceVerifiedExecutable, verifyTreeSitterExecutable };

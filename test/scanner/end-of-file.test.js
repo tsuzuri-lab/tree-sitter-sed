@@ -78,3 +78,58 @@ test("accepts valid scripts without a final newline", async (t) => {
     });
   }
 });
+
+test("reports incomplete delimited operands at end of file", async (t) => {
+  const cases = [
+    {
+      name: "empty regex address",
+      source: "/",
+      expected: { regex_content: [""] },
+    },
+    {
+      name: "empty substitute pattern",
+      source: "s/",
+      expected: { regex_content: [""] },
+    },
+    {
+      name: "empty substitute replacement",
+      source: "s/a/",
+      expected: {
+        regex_content: ["a"],
+        replacement: [""],
+      },
+    },
+    {
+      name: "empty translate source",
+      source: "y/",
+      expected: { translate_source: [""] },
+    },
+    {
+      name: "empty translate destination",
+      source: "y/a/",
+      expected: {
+        translate_source: ["a"],
+        translate_destination: [""],
+      },
+    },
+    {
+      name: "unterminated translate destination",
+      source: "y/a/b",
+      expected: {
+        translate_source: ["a"],
+        translate_destination: ["b"],
+      },
+    },
+  ];
+
+  for (const { name, source, expected } of cases) {
+    await t.test(name, () => {
+      const result = parser.parseSource(source, { name });
+
+      assert.equal(result.hasSyntaxError, true, result.output);
+      for (const [node, texts] of Object.entries(expected)) {
+        assert.deepEqual(nodeTexts(result.stdout, result.source, node), texts);
+      }
+    });
+  }
+});

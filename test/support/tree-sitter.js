@@ -75,6 +75,14 @@ function nodeCounts(cst, names) {
   );
 }
 
+function comparableCst(cst) {
+  return cst
+    .split(/\r?\n/)
+    .filter((line) => !/\t(?:Edit|Parse):/.test(line))
+    .join("\n")
+    .trimEnd();
+}
+
 function createParserHarness(name) {
   const temporaryDirectory = mkdtempSync(
     join(tmpdir(), `tree-sitter-sed-${name}-`),
@@ -203,6 +211,7 @@ function createParserHarness(name) {
 }
 
 module.exports = {
+  comparableCst,
   createParserHarness,
   nodeCounts,
   nodeTexts,

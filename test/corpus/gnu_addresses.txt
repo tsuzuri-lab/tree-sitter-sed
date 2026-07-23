@@ -139,6 +139,24 @@ Parses a GNU zero-to-regex address range
     (separator)))
 
 ==================
+Allows zero as the second GNU range address
+==================
+1,0p
+
+---
+
+(script
+  (command_list
+    (command
+      addresses: (address_range
+        start: (address
+          (line_number_address))
+        end: (address
+          (line_number_address)))
+      body: (print_command))
+    (separator)))
+
+==================
 Parses GNU regex-address flags with optional blanks
 ==================
 /x/IMp

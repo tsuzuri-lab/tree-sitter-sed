@@ -15,7 +15,7 @@
   "metadata": {
     "version": "0.1.0",
     "license": "MIT",
-    "description": "Tree-sitter grammar for POSIX and GNU sed scripts",
+    "description": "Tree-sitter grammar for sed scripts, covering POSIX.1-2024 syntax and GNU sed extensions.",
     "authors": [
       {
         "name": "tsuzuri-lab"

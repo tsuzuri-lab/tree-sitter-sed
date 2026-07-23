@@ -185,7 +185,7 @@ s/[ ][ ]*/_/g
 ==================
 Keeps backreferences and ampersands inside replacement text
 ==================
-s/^x$/replacement keeps [[:digit:]] \1 \& literal/
+s/^\(x\)$/replacement keeps [[:digit:]] \1 \& literal/
 
 ---
 

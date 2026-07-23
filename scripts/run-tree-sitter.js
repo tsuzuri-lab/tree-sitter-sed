@@ -16,15 +16,15 @@ const cacheDirectory = join(temporaryDirectory, "cache");
 const configDirectory = join(temporaryDirectory, "config");
 const treeSitterConfigDirectory = join(configDirectory, "tree-sitter");
 
-mkdirSync(cacheDirectory);
-mkdirSync(treeSitterConfigDirectory, { recursive: true });
-writeFileSync(
-  join(treeSitterConfigDirectory, "config.json"),
-  `${JSON.stringify({ "parser-directories": [dirname(root)] }, null, 2)}\n`,
-);
-
 let result;
 try {
+  mkdirSync(cacheDirectory);
+  mkdirSync(treeSitterConfigDirectory, { recursive: true });
+  writeFileSync(
+    join(treeSitterConfigDirectory, "config.json"),
+    `${JSON.stringify({ "parser-directories": [dirname(root)] }, null, 2)}\n`,
+  );
+
   result = spawnSync(executable, process.argv.slice(2), {
     cwd: root,
     env: {

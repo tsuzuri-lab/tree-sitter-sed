@@ -31,9 +31,10 @@ npm run setup:cli
 npm run check
 ```
 
-`npm test` runs the corpus, highlighting, and Node regression tests.
-`npm run check` also verifies that generated files are current. No global
-Tree-sitter installation is required.
+`npm run format` formats editable JavaScript and JSON with Biome. `npm test`
+runs the corpus, highlighting, and Node regression tests. `npm run check` also
+runs Biome diagnostics and verifies that generated files are current. No
+global Tree-sitter installation is required.
 
 ## References
 

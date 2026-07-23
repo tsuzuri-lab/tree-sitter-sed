@@ -1,5 +1,5 @@
 /**
- * @file Tree-sitter grammar for POSIX and GNU sed scripts.
+ * @file Tree-sitter grammar for sed scripts, covering POSIX.1-2024 syntax and GNU sed extensions.
  * @author tsuzuri-lab
  * @license MIT
  */
@@ -107,7 +107,23 @@ function addressedCommand($, descriptors, maxAddresses) {
     field("body", commandBodyChoice($, descriptors)),
   );
 
-  return seq(...parts);
+  const standardForm = seq(...parts);
+  const zeroAddressDescriptors = descriptors.filter(
+    ({ allowsZeroAddress }) => allowsZeroAddress,
+  );
+
+  if (zeroAddressDescriptors.length === 0) {
+    return standardForm;
+  }
+
+  return choice(
+    standardForm,
+    seq(
+      field("addresses", alias($._zero_address, $.address)),
+      optional($._blanks),
+      field("body", commandBodyChoice($, zeroAddressDescriptors)),
+    ),
+  );
 }
 
 function commandsForTermination($, termination) {
@@ -154,6 +170,7 @@ module.exports = grammar({
     [$._command_sequence],
     [$._block_command_sequence],
     [$.address, $.periodic_address],
+    [$.periodic_address, $._zero_address],
     [$.regex_address],
     [$.escaped_regex_address],
     [$.regex_flags],
@@ -261,18 +278,35 @@ module.exports = grammar({
 
     _line_terminated_command: ($) => commandsForTermination($, "line"),
 
-    address_range: ($) =>
-      seq(
-        field("start", $.address),
-        optional($._blanks),
-        ",",
-        optional($._blanks),
-        field("end", syntaxRuleChoice($, syntaxCapabilities.rangeEndRules)),
-      ),
+    address_range: ($) => {
+      const forms = [
+        seq(
+          field("start", $.address),
+          optional($._blanks),
+          ",",
+          optional($._blanks),
+          field("end", syntaxRuleChoice($, syntaxCapabilities.rangeEndRules)),
+        ),
+      ];
+
+      if (syntaxCapabilities.zeroRegexRangeStart) {
+        forms.push(
+          seq(
+            field("start", alias($._zero_address, $.address)),
+            optional($._blanks),
+            ",",
+            optional($._blanks),
+            field("end", alias($._zero_regex_range_end, $.address)),
+          ),
+        );
+      }
+
+      return choice(...forms);
+    },
 
     address: ($) => syntaxRuleChoice($, syntaxCapabilities.addressRules),
 
-    line_number_address: () => /\d+/,
+    line_number_address: () => /0*[1-9]\d*/,
 
     last_line_address: () => "$",
 

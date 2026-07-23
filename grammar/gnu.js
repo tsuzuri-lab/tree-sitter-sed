@@ -10,7 +10,12 @@ module.exports = {
   syntax: {
     extendedCommandLoopWhitespace: true,
     addressRules: ["periodic_address"],
-    rangeEndRules: ["relative_address", "next_multiple_address"],
+    rangeEndRules: [
+      { rule: "_zero_address", alias: "address" },
+      "relative_address",
+      "next_multiple_address",
+    ],
+    zeroRegexRangeStart: true,
     regexAddressFlags: [
       { rule: "_address_ignore_case_flag", alias: "ignore_case_flag" },
       { rule: "_address_multiline_flag", alias: "multiline_flag" },
@@ -23,15 +28,37 @@ module.exports = {
   },
   rules: {
     periodic_address: ($) =>
-      seq(
-        field("start", $.line_number_address),
-        optional($._blanks),
-        "~",
-        optional($._blanks),
-        field("step", $.step_value),
+      choice(
+        seq(
+          field("start", $.line_number_address),
+          optional($._blanks),
+          "~",
+          optional($._blanks),
+          field("step", $.step_value),
+        ),
+        seq(
+          field(
+            "start",
+            alias($._zero_line_number_address, $.line_number_address),
+          ),
+          optional($._blanks),
+          "~",
+          optional($._blanks),
+          field("step", alias($._positive_step_value, $.step_value)),
+        ),
       ),
 
     step_value: () => /\d+/,
+
+    _positive_step_value: () => /0*[1-9]\d*/,
+
+    _zero_line_number_address: () => /0+/,
+
+    _zero_address: ($) =>
+      alias($._zero_line_number_address, $.line_number_address),
+
+    _zero_regex_range_end: ($) =>
+      choice($.regex_address, $.escaped_regex_address),
 
     relative_address: ($) =>
       seq("+", optional($._blanks), field("offset", $.line_offset)),
@@ -106,7 +133,12 @@ module.exports = {
 
     { rule: "append_command", maxAddresses: 2, termination: "line" },
     { rule: "insert_command", maxAddresses: 2, termination: "line" },
-    { rule: "read_command", maxAddresses: 2, termination: "line" },
+    {
+      rule: "read_command",
+      maxAddresses: 2,
+      termination: "line",
+      allowsZeroAddress: true,
+    },
     { rule: "execute_command", maxAddresses: 2, termination: "line" },
     { rule: "read_line_command", maxAddresses: 2, termination: "line" },
     { rule: "write_first_line_command", maxAddresses: 2, termination: "line" },

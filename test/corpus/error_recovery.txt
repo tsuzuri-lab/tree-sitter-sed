@@ -287,7 +287,7 @@ p
           (line_number_address))
         end: (relative_address
           offset: (line_offset
-            (MISSING "line_number_address_token1"))))
+            (MISSING "occurrence_flag_token1"))))
       body: (print_command))
     (separator)
     (command
@@ -310,7 +310,7 @@ p
           (line_number_address))
         end: (next_multiple_address
           multiple: (step_value
-            (MISSING "line_number_address_token1"))))
+            (MISSING "occurrence_flag_token1"))))
       body: (print_command))
     (separator)
     (command

@@ -32,13 +32,15 @@
     "setup:cli": "node scripts/install-tree-sitter.js",
     "cli": "node scripts/run-tree-sitter.js",
     "generate": "tree-sitter generate",
+    "format": "biome format --write .",
+    "check:biome": "biome check .",
     "check:generated": "node scripts/check-generated.js",
     "test": "npm run test:corpus && npm run test:node",
     "test:corpus": "node scripts/run-tree-sitter.js test",
     "test:node": "node --test \"test/**/*.test.js\"",
     "test:debug": "node scripts/run-tree-sitter.js test --debug-build --rebuild",
     "test:fuzz": "node scripts/run-tree-sitter.js fuzz --iterations 100 --edits 5 --rebuild",
-    "check": "npm run check:generated && npm test"
+    "check": "npm run check:biome && npm run check:generated && npm test"
   },
   "keywords": [
     "tree-sitter",

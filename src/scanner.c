@@ -790,8 +790,7 @@ static enum RegexScanResult scan_regex_content(
 
 static enum TextScanResult scan_text_until_delimiter(
     TSLexer *lexer,
-    int32_t delimiter,
-    bool allow_escaped_newline) {
+    int32_t delimiter) {
   bool consumed = false;
   lexer->mark_end(lexer);
 
@@ -809,9 +808,7 @@ static enum TextScanResult scan_text_until_delimiter(
       }
 
       if (lexer->lookahead == '\n') {
-        if (allow_escaped_newline) {
-          consume(lexer);
-        }
+        consume(lexer);
         continue;
       }
 
@@ -824,13 +821,8 @@ static enum TextScanResult scan_text_until_delimiter(
             continue;
           }
 
-          if (allow_escaped_newline) {
-            consume(lexer);
-            continue;
-          }
-
-          return consumed ? TEXT_SCAN_UNTERMINATED
-                          : TEXT_SCAN_EMPTY_UNTERMINATED;
+          consume(lexer);
+          continue;
         }
 
         lexer->mark_end(lexer);
@@ -896,7 +888,7 @@ static bool scan_replacement_text(TSLexer *lexer, ScannerState *state) {
   }
 
   enum TextScanResult result =
-      scan_text_until_delimiter(lexer, state->delimiter, true);
+      scan_text_until_delimiter(lexer, state->delimiter);
 
   if (result == TEXT_SCAN_EMPTY_UNTERMINATED) {
     reset_state(state);
@@ -918,7 +910,7 @@ static bool scan_translate_text(TSLexer *lexer, ScannerState *state) {
   }
 
   enum TextScanResult result =
-      scan_text_until_delimiter(lexer, state->delimiter, true);
+      scan_text_until_delimiter(lexer, state->delimiter);
 
   if (result == TEXT_SCAN_EMPTY_UNTERMINATED) {
     reset_state(state);

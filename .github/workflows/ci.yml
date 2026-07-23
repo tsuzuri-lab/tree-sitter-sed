@@ -21,7 +21,7 @@ env:
 
 jobs:
   test:
-    if: github.event_name != 'schedule'
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
     name: Test (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15
@@ -74,7 +74,7 @@ jobs:
 
   maintenance:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-    name: Scheduled fuzz
+    name: Fuzz
     runs-on: ubuntu-24.04
     timeout-minutes: 30
 

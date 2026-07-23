@@ -1,7 +1,11 @@
 const assert = require("node:assert/strict");
 const { after, test } = require("node:test");
 const { CRLF, joinLines } = require("../support/source");
-const { createParserHarness, nodeCounts } = require("../support/tree-sitter");
+const {
+  createParserHarness,
+  nodeCounts,
+  nodeTexts,
+} = require("../support/tree-sitter");
 
 const parser = createParserHarness("crlf");
 after(() => parser.close());
@@ -213,6 +217,90 @@ test("parses valid sed scripts with CRLF line endings", async (t) => {
         expectedCounts,
         result.output,
       );
+    });
+  }
+});
+
+test("keeps escaped CRLF inside delimited operand ranges", () => {
+  const name = "escaped CRLF operand ranges";
+  const source = joinLines(CRLF, [
+    "/foo\\",
+    "bar/p",
+    "s/a/b\\",
+    "c/p",
+    "y/a\\",
+    "b/c\\",
+    "d/",
+    "",
+  ]);
+  const result = parser.parseSource(source, { name });
+
+  assert.deepEqual(
+    {
+      exitCode: result.exitCode,
+      hasSyntaxError: result.hasSyntaxError,
+    },
+    {
+      exitCode: 0,
+      hasSyntaxError: false,
+    },
+    result.output,
+  );
+  assert.deepEqual(nodeTexts(result.stdout, result.source, "regex_content"), [
+    `foo\\${CRLF}bar`,
+    "a",
+  ]);
+  assert.deepEqual(nodeTexts(result.stdout, result.source, "replacement"), [
+    `b\\${CRLF}c`,
+  ]);
+  assert.deepEqual(
+    nodeTexts(result.stdout, result.source, "translate_source"),
+    [`a\\${CRLF}b`],
+  );
+  assert.deepEqual(
+    nodeTexts(result.stdout, result.source, "translate_destination"),
+    [`c\\${CRLF}d`],
+  );
+});
+
+test("excludes CRLF carriage returns from unterminated operand ranges", async (t) => {
+  const cases = [
+    {
+      name: "unterminated regex address",
+      source: joinLines(CRLF, ["/foo", "p", ""]),
+      expected: {
+        regex_content: ["foo"],
+        print_command: ["p"],
+      },
+    },
+    {
+      name: "unterminated substitute replacement",
+      source: joinLines(CRLF, ["s/a/b", "p", ""]),
+      expected: {
+        regex_content: ["a"],
+        replacement: ["b"],
+        print_command: ["p"],
+      },
+    },
+    {
+      name: "unterminated translate destination",
+      source: joinLines(CRLF, ["y/a/b", "p", ""]),
+      expected: {
+        translate_source: ["a"],
+        translate_destination: ["b"],
+        print_command: ["p"],
+      },
+    },
+  ];
+
+  for (const { name, source, expected } of cases) {
+    await t.test(name, () => {
+      const result = parser.parseSource(source, { name });
+
+      assert.equal(result.hasSyntaxError, true, result.output);
+      for (const [node, texts] of Object.entries(expected)) {
+        assert.deepEqual(nodeTexts(result.stdout, result.source, node), texts);
+      }
     });
   }
 });

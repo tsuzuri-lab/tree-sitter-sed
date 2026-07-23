@@ -50,42 +50,73 @@ function mergeRules(...profiles) {
 }
 
 function mergeProfiles(...profiles) {
-  const commands = new Map();
+  const commandsByRule = new Map();
+  const aliasesByRule = new Map();
 
   for (const profile of profiles) {
     for (const descriptor of profile.commands) {
-      const previous = commands.get(descriptor.rule);
-      if (!previous) {
-        commands.set(descriptor.rule, { ...descriptor });
-        continue;
-      }
+      const previousAlias = aliasesByRule.get(descriptor.rule);
 
       if (
-        previous.alias &&
+        previousAlias &&
         descriptor.alias &&
-        previous.alias !== descriptor.alias
+        previousAlias !== descriptor.alias
       ) {
         throw new Error(
           `Conflicting aliases for sed command ${descriptor.rule}: ` +
-            `${previous.alias} and ${descriptor.alias}`,
+            `${previousAlias} and ${descriptor.alias}`,
         );
       }
 
-      commands.set(descriptor.rule, {
-        ...previous,
-        ...descriptor,
-        alias: previous.alias || descriptor.alias,
-        maxAddresses: Math.max(previous.maxAddresses, descriptor.maxAddresses),
-        termination:
-          previous.termination === "chainable" ||
-          descriptor.termination === "chainable"
-            ? "chainable"
-            : "line",
-      });
+      if (descriptor.alias) {
+        aliasesByRule.set(descriptor.rule, descriptor.alias);
+      }
+
+      const commands = commandsByRule.get(descriptor.rule) || [];
+      commands.push({ ...descriptor });
+      commandsByRule.set(descriptor.rule, commands);
     }
   }
 
-  return [...commands.values()];
+  const merged = [];
+
+  for (const [rule, descriptors] of commandsByRule) {
+    const alias = aliasesByRule.get(rule);
+    const distinct = [];
+    const seen = new Set();
+
+    for (const descriptor of descriptors) {
+      const normalized = alias ? { ...descriptor, alias } : descriptor;
+      const key = JSON.stringify({
+        maxAddresses: normalized.maxAddresses,
+        termination: normalized.termination,
+        allowsZeroAddress: Boolean(normalized.allowsZeroAddress),
+      });
+
+      if (!seen.has(key)) {
+        distinct.push(normalized);
+        seen.add(key);
+      }
+    }
+
+    for (const descriptor of distinct) {
+      const isCovered = distinct.some(
+        (candidate) =>
+          candidate !== descriptor &&
+          candidate.maxAddresses >= descriptor.maxAddresses &&
+          (candidate.termination === descriptor.termination ||
+            (candidate.termination === "chainable" &&
+              descriptor.termination === "line")) &&
+          (candidate.allowsZeroAddress || !descriptor.allowsZeroAddress),
+      );
+
+      if (!isCovered) {
+        merged.push(descriptor);
+      }
+    }
+  }
+
+  return merged;
 }
 
 function groupCommands(commands) {

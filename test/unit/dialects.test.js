@@ -47,13 +47,20 @@ test("groups merged POSIX and GNU commands by their broadest capability", () => 
     ruleNames(commandGroups.twoAddressLineTerminated).includes("read_command"),
     true,
   );
+  assert.equal(
+    commandGroups.twoAddressLineTerminated.find(
+      ({ rule }) => rule === "read_command",
+    ).allowsZeroAddress,
+    true,
+  );
 });
 
 test("merging dialect profiles is independent of profile order", () => {
   function comparableProfile(...dialects) {
     return mergeProfiles(...dialects)
-      .map(({ alias, maxAddresses, rule, termination }) => ({
+      .map(({ alias, allowsZeroAddress, maxAddresses, rule, termination }) => ({
         alias,
+        allowsZeroAddress: Boolean(allowsZeroAddress),
         maxAddresses,
         rule,
         termination,
@@ -88,6 +95,107 @@ test("a narrower profile cannot remove broader command capabilities", () => {
       maxAddresses: 2,
       termination: "chainable",
     },
+  );
+});
+
+test("does not synthesize unsupported command capability combinations", () => {
+  const twoAddressLineProfile = {
+    commands: [
+      { rule: "example_command", maxAddresses: 2, termination: "line" },
+    ],
+  };
+  const oneAddressChainableProfile = {
+    commands: [
+      { rule: "example_command", maxAddresses: 1, termination: "chainable" },
+    ],
+  };
+  const merged = mergeProfiles(
+    twoAddressLineProfile,
+    oneAddressChainableProfile,
+  );
+  const groups = groupCommands(merged);
+
+  assert.deepEqual(
+    merged.map(({ maxAddresses, termination }) => ({
+      maxAddresses,
+      termination,
+    })),
+    [
+      { maxAddresses: 2, termination: "line" },
+      { maxAddresses: 1, termination: "chainable" },
+    ],
+  );
+  assert.deepEqual(ruleNames(groups.twoAddressLineTerminated), [
+    "example_command",
+  ]);
+  assert.deepEqual(ruleNames(groups.oneAddressChainable), ["example_command"]);
+  assert.deepEqual(groups.twoAddressChainable, []);
+
+  const reversed = mergeProfiles(
+    oneAddressChainableProfile,
+    twoAddressLineProfile,
+  )
+    .map(({ maxAddresses, termination }) => ({ maxAddresses, termination }))
+    .sort((left, right) => left.maxAddresses - right.maxAddresses);
+  const forward = merged
+    .map(({ maxAddresses, termination }) => ({ maxAddresses, termination }))
+    .sort((left, right) => left.maxAddresses - right.maxAddresses);
+
+  assert.deepEqual(reversed, forward);
+});
+
+test("treats zero-address support as an independent capability", () => {
+  const twoAddressProfile = {
+    commands: [
+      { rule: "example_command", maxAddresses: 2, termination: "line" },
+    ],
+  };
+  const zeroAddressProfile = {
+    commands: [
+      {
+        rule: "example_command",
+        maxAddresses: 1,
+        termination: "line",
+        allowsZeroAddress: true,
+      },
+    ],
+  };
+  const merged = mergeProfiles(twoAddressProfile, zeroAddressProfile);
+
+  assert.deepEqual(
+    merged.map(({ allowsZeroAddress, maxAddresses, termination }) => ({
+      allowsZeroAddress: Boolean(allowsZeroAddress),
+      maxAddresses,
+      termination,
+    })),
+    [
+      {
+        allowsZeroAddress: false,
+        maxAddresses: 2,
+        termination: "line",
+      },
+      {
+        allowsZeroAddress: true,
+        maxAddresses: 1,
+        termination: "line",
+      },
+    ],
+  );
+
+  const broaderProfile = {
+    commands: [
+      {
+        rule: "example_command",
+        maxAddresses: 2,
+        termination: "chainable",
+        allowsZeroAddress: true,
+      },
+    ],
+  };
+
+  assert.deepEqual(
+    mergeProfiles(twoAddressProfile, zeroAddressProfile, broaderProfile),
+    [broaderProfile.commands[0]],
   );
 });
 
