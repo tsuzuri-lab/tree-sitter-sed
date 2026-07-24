@@ -21,3 +21,17 @@ s/a/b/IMe
 #     ^ attribute
 #      ^ attribute
 #       ^ attribute
+
+s/a/&/
+#   ^ string.special
+
+s/a/\1/
+#   ^^ string.special
+
+s/a/\&/
+#   ^^ string.escape
+
+s/a/\L&\E/
+#   ^^ string.escape
+#     ^ string.special
+#      ^^ string.escape

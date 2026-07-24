@@ -99,7 +99,7 @@ s/a/b/g w output file;#literal
     (separator)))
 
 ==================
-Keeps GNU case-conversion escapes inside replacement text
+Parses GNU case-conversion escapes inside replacement text
 ==================
 s/x/\L&\E/
 p
@@ -112,7 +112,10 @@ p
       body: (substitute_command
         pattern: (regex
           body: (regex_content))
-        replacement: (replacement)))
+        replacement: (replacement
+          (case_conversion)
+          (match_reference)
+          (case_conversion))))
     (separator)
     (command
       body: (print_command))

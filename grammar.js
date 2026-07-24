@@ -150,7 +150,10 @@ module.exports = grammar({
     $._translate_middle,
     $._translate_end,
     $._regex_content,
-    $._replacement_text,
+    $._replacement_literal,
+    $._replacement_backreference,
+    $._replacement_escape_sequence,
+    $._replacement_case_conversion,
     $._translate_text,
     $._text_command_start,
     $._text_block,
@@ -472,7 +475,16 @@ module.exports = grammar({
 
     regex_content: ($) => $._regex_content,
 
-    replacement: ($) => $._replacement_text,
+    replacement: ($) =>
+      repeat1(
+        choice(
+          $._replacement_literal,
+          alias("&", $.match_reference),
+          alias($._replacement_backreference, $.backreference),
+          alias($._replacement_escape_sequence, $.escape_sequence),
+          alias($._replacement_case_conversion, $.case_conversion),
+        ),
+      ),
 
     translate_source: ($) => $._translate_text,
 

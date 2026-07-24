@@ -60,6 +60,128 @@ test("restores every delimited scanner mode after incremental edits", async (t) 
   }
 });
 
+test("reclassifies replacement tokens after incremental edits", async (t) => {
+  const cases = [
+    {
+      name: "changes a backreference to a case conversion",
+      source: "s/a/\\1/\n",
+      edits: [{ byteOffset: 5, deletedByteLength: 1, text: "L" }],
+      hasSyntaxError: false,
+    },
+    {
+      name: "changes a case conversion to an unspecified escape",
+      source: "s/a/\\L/\n",
+      edits: [{ byteOffset: 5, deletedByteLength: 1, text: "q" }],
+      hasSyntaxError: false,
+    },
+    {
+      name: "changes an unspecified escape to a backreference",
+      source: "s/a/\\q/\n",
+      edits: [{ byteOffset: 5, deletedByteLength: 1, text: "1" }],
+      hasSyntaxError: false,
+    },
+    {
+      name: "changes literal text to a whole-match reference",
+      source: "s/a/x/\n",
+      edits: [{ byteOffset: 4, deletedByteLength: 1, text: "&" }],
+      hasSyntaxError: false,
+    },
+    {
+      name: "changes a backreference into an escaped digit delimiter",
+      source: "s/a/\\1/\n",
+      edits: [
+        { byteOffset: 1, deletedByteLength: 1, text: "1" },
+        { byteOffset: 3, deletedByteLength: 1, text: "1" },
+        { byteOffset: 6, deletedByteLength: 1, text: "1" },
+      ],
+      hasSyntaxError: false,
+    },
+    {
+      name: "changes a case conversion into an escaped letter delimiter",
+      source: "s/a/\\L/\n",
+      edits: [
+        { byteOffset: 1, deletedByteLength: 1, text: "L" },
+        { byteOffset: 3, deletedByteLength: 1, text: "L" },
+        { byteOffset: 6, deletedByteLength: 1, text: "L" },
+      ],
+      hasSyntaxError: false,
+    },
+    {
+      name: "changes slash delimiters to ampersands",
+      source: "s/a/\\&/\n",
+      edits: [
+        { byteOffset: 1, deletedByteLength: 1, text: "&" },
+        { byteOffset: 3, deletedByteLength: 1, text: "&" },
+        { byteOffset: 6, deletedByteLength: 1, text: "&" },
+      ],
+      hasSyntaxError: false,
+    },
+    {
+      name: "changes slash delimiters to backslashes",
+      source: "s/a/b/\n",
+      edits: [
+        { byteOffset: 1, deletedByteLength: 1, text: "\\" },
+        { byteOffset: 3, deletedByteLength: 1, text: "\\" },
+        { byteOffset: 5, deletedByteLength: 1, text: "\\" },
+      ],
+      hasSyntaxError: false,
+    },
+    {
+      name: "changes slash delimiters to carriage returns",
+      source: "s/a/b/\n",
+      edits: [
+        { byteOffset: 1, deletedByteLength: 1, text: "\r" },
+        { byteOffset: 3, deletedByteLength: 1, text: "\r" },
+        { byteOffset: 5, deletedByteLength: 1, text: "\r" },
+      ],
+      hasSyntaxError: false,
+    },
+  ];
+
+  for (const testCase of cases) {
+    await t.test(testCase.name, () => compareWithFullParse(testCase));
+  }
+});
+
+test("resets replacement token state at incomplete line endings", async (t) => {
+  const cases = [
+    {
+      name: "reclassifies a token before end of file",
+      source: "s/a/\\1",
+      edits: [{ byteOffset: 5, deletedByteLength: 1, text: "L" }],
+      hasSyntaxError: true,
+    },
+    {
+      name: "reclassifies a token before LF",
+      source: "s/a/\\1\np\n",
+      edits: [{ byteOffset: 5, deletedByteLength: 1, text: "q" }],
+      hasSyntaxError: true,
+    },
+    {
+      name: "reclassifies a token before CRLF",
+      source: "s/a/\\1\r\np\r\n",
+      edits: [{ byteOffset: 5, deletedByteLength: 1, text: "q" }],
+      hasSyntaxError: true,
+    },
+    {
+      name: "replaces unterminated literal text with a trailing backslash",
+      source: "s/a/x",
+      edits: [{ byteOffset: 4, deletedByteLength: 1, text: "\\" }],
+      hasSyntaxError: true,
+    },
+    {
+      name: "escapes the closing replacement delimiter",
+      source: "s/a/b/\np\n",
+      edits: [{ byteOffset: 5, deletedByteLength: 0, text: "\\" }],
+      hasSyntaxError: true,
+    },
+  ];
+
+  for (const testCase of cases) {
+    await t.test(testCase.name, () => compareWithFullParse(testCase));
+  }
+});
+
 test("updates text scanner modes and backslash parity after edits", async (t) => {
   const cases = [
     {

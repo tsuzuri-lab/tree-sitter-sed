@@ -183,9 +183,9 @@ s/[ ][ ]*/_/g
     (separator)))
 
 ==================
-Keeps backreferences and ampersands inside replacement text
+Parses references and escape sequences inside replacement text
 ==================
-s/^\(x\)$/replacement keeps [[:digit:]] \1 \& literal/
+s/^\(x\)$/literal & \1 \& \\ \//
 
 ---
 
@@ -195,7 +195,12 @@ s/^\(x\)$/replacement keeps [[:digit:]] \1 \& literal/
       body: (substitute_command
         pattern: (regex
           body: (regex_content))
-        replacement: (replacement)))
+        replacement: (replacement
+          (match_reference)
+          (backreference)
+          (escape_sequence)
+          (escape_sequence)
+          (escape_sequence))))
     (separator)))
 
 ==================
@@ -260,7 +265,8 @@ two/
       body: (substitute_command
         pattern: (regex
           body: (regex_content))
-        replacement: (replacement)))
+        replacement: (replacement
+          (escape_sequence))))
     (separator)))
 
 ==================

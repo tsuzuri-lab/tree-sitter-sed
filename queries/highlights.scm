@@ -24,6 +24,16 @@
   (shell_command)
 ] @string
 
+[
+  (match_reference)
+  (backreference)
+] @string.special
+
+[
+  (escape_sequence)
+  (case_conversion)
+] @string.escape
+
 (file_argument) @string.special
 [
   (label)

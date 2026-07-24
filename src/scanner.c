@@ -15,7 +15,10 @@ enum TokenType {
   TRANSLATE_MIDDLE,
   TRANSLATE_END,
   REGEX_CONTENT,
-  REPLACEMENT_TEXT,
+  REPLACEMENT_LITERAL,
+  REPLACEMENT_BACKREFERENCE,
+  REPLACEMENT_ESCAPE_SEQUENCE,
+  REPLACEMENT_CASE_CONVERSION,
   TRANSLATE_TEXT,
   TEXT_COMMAND_START,
   TEXT_BLOCK,
@@ -882,25 +885,109 @@ static bool scan_regex_text(TSLexer *lexer, ScannerState *state) {
          result == REGEX_SCAN_UNTERMINATED;
 }
 
-static bool scan_replacement_text(TSLexer *lexer, ScannerState *state) {
-  if (state->mode != MODE_SUBSTITUTE_REPLACEMENT) {
+static bool replacement_backreference_char(int32_t character) {
+  return character >= '1' && character <= '9';
+}
+
+static bool replacement_case_conversion_char(int32_t character) {
+  return character == 'L' || character == 'l' || character == 'U' ||
+         character == 'u' || character == 'E';
+}
+
+static bool scan_replacement_literal(
+    TSLexer *lexer,
+    ScannerState *state) {
+  bool consumed = false;
+  lexer->mark_end(lexer);
+
+  while (!lexer->eof(lexer) && lexer->lookahead != '\n') {
+    if (lexer->lookahead == state->delimiter ||
+        lexer->lookahead == '\\' || lexer->lookahead == '&') {
+      return consumed;
+    }
+
+    if (lexer->lookahead == '\r') {
+      advance(lexer);
+      if (lexer->lookahead == '\n') {
+        reset_state(state);
+        return true;
+      }
+
+      lexer->mark_end(lexer);
+      consumed = true;
+      continue;
+    }
+
+    consume(lexer);
+    consumed = true;
+  }
+
+  reset_state(state);
+  return true;
+}
+
+static bool scan_replacement_escape(
+    TSLexer *lexer,
+    ScannerState *state,
+    const bool *valid_symbols,
+    TSSymbol *symbol) {
+  advance(lexer);
+
+  TSSymbol result = REPLACEMENT_ESCAPE_SEQUENCE;
+  if (!lexer->eof(lexer)) {
+    if (lexer->lookahead == state->delimiter) {
+      result = REPLACEMENT_ESCAPE_SEQUENCE;
+    } else if (replacement_backreference_char(lexer->lookahead)) {
+      result = REPLACEMENT_BACKREFERENCE;
+    } else if (replacement_case_conversion_char(lexer->lookahead)) {
+      result = REPLACEMENT_CASE_CONVERSION;
+    }
+  }
+
+  if (!valid_symbols[result]) {
     return false;
   }
 
-  enum TextScanResult result =
-      scan_text_until_delimiter(lexer, state->delimiter);
-
-  if (result == TEXT_SCAN_EMPTY_UNTERMINATED) {
+  if (lexer->eof(lexer)) {
+    lexer->mark_end(lexer);
     reset_state(state);
+  } else if (lexer->lookahead == '\r') {
+    advance(lexer);
+    if (lexer->lookahead == '\n' && state->delimiter != '\r') {
+      consume(lexer);
+    } else {
+      lexer->mark_end(lexer);
+    }
+  } else {
+    consume(lexer);
+  }
+
+  *symbol = result;
+  return true;
+}
+
+static bool scan_replacement_token(
+    TSLexer *lexer,
+    ScannerState *state,
+    const bool *valid_symbols,
+    TSSymbol *symbol) {
+  if (state->mode != MODE_SUBSTITUTE_REPLACEMENT ||
+      lexer->lookahead == state->delimiter) {
+    return false;
+  }
+
+  if (lexer->lookahead == '\\') {
+    return scan_replacement_escape(
+        lexer, state, valid_symbols, symbol);
+  }
+
+  if (valid_symbols[REPLACEMENT_LITERAL] &&
+      scan_replacement_literal(lexer, state)) {
+    *symbol = REPLACEMENT_LITERAL;
     return true;
   }
 
-  if (result == TEXT_SCAN_UNTERMINATED) {
-    reset_state(state);
-  }
-
-  return result == TEXT_SCAN_TERMINATED ||
-         result == TEXT_SCAN_UNTERMINATED;
+  return false;
 }
 
 static bool scan_translate_text(TSLexer *lexer, ScannerState *state) {
@@ -944,9 +1031,15 @@ bool tree_sitter_sed_external_scanner_scan(
     return true;
   }
 
-  if (valid_symbols[REPLACEMENT_TEXT] && scan_replacement_text(lexer, state)) {
-    lexer->result_symbol = REPLACEMENT_TEXT;
-    return true;
+  if (state->mode == MODE_SUBSTITUTE_REPLACEMENT &&
+      lexer->lookahead != state->delimiter) {
+    TSSymbol replacement_symbol;
+    if (scan_replacement_token(
+            lexer, state, valid_symbols, &replacement_symbol)) {
+      lexer->result_symbol = replacement_symbol;
+      return true;
+    }
+    return false;
   }
 
   if (valid_symbols[TRANSLATE_TEXT] && scan_translate_text(lexer, state)) {

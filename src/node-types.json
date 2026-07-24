@@ -659,7 +659,29 @@
   {
     "type": "replacement",
     "named": true,
-    "fields": {}
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "backreference",
+          "named": true
+        },
+        {
+          "type": "case_conversion",
+          "named": true
+        },
+        {
+          "type": "escape_sequence",
+          "named": true
+        },
+        {
+          "type": "match_reference",
+          "named": true
+        }
+      ]
+    }
   },
   {
     "type": "script",
@@ -969,8 +991,16 @@
     "named": false
   },
   {
+    "type": "backreference",
+    "named": true
+  },
+  {
     "type": "c",
     "named": false
+  },
+  {
+    "type": "case_conversion",
+    "named": true
   },
   {
     "type": "clear_command",
@@ -991,6 +1021,10 @@
   {
     "type": "e",
     "named": false
+  },
+  {
+    "type": "escape_sequence",
+    "named": true
   },
   {
     "type": "exchange_command",
@@ -1043,6 +1077,10 @@
   {
     "type": "m",
     "named": false
+  },
+  {
+    "type": "match_reference",
+    "named": true
   },
   {
     "type": "negation",

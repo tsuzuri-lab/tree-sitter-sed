@@ -2188,8 +2188,52 @@
       "name": "_regex_content"
     },
     "replacement": {
-      "type": "SYMBOL",
-      "name": "_replacement_text"
+      "type": "REPEAT1",
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "_replacement_literal"
+          },
+          {
+            "type": "ALIAS",
+            "content": {
+              "type": "STRING",
+              "value": "&"
+            },
+            "named": true,
+            "value": "match_reference"
+          },
+          {
+            "type": "ALIAS",
+            "content": {
+              "type": "SYMBOL",
+              "name": "_replacement_backreference"
+            },
+            "named": true,
+            "value": "backreference"
+          },
+          {
+            "type": "ALIAS",
+            "content": {
+              "type": "SYMBOL",
+              "name": "_replacement_escape_sequence"
+            },
+            "named": true,
+            "value": "escape_sequence"
+          },
+          {
+            "type": "ALIAS",
+            "content": {
+              "type": "SYMBOL",
+              "name": "_replacement_case_conversion"
+            },
+            "named": true,
+            "value": "case_conversion"
+          }
+        ]
+      }
     },
     "translate_source": {
       "type": "SYMBOL",
@@ -3201,7 +3245,19 @@
     },
     {
       "type": "SYMBOL",
-      "name": "_replacement_text"
+      "name": "_replacement_literal"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_replacement_backreference"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_replacement_escape_sequence"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_replacement_case_conversion"
     },
     {
       "type": "SYMBOL",
